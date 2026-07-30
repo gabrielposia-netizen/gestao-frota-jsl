@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: frota_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: frota
+      POSTGRES_PASSWORD: frota123
+      POSTGRES_DB: gestao_frota
+    ports:
+      - "5432:5432"
+    volumes:
+      - frota_pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: frota_backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://frota:frota123@db:5432/gestao_frota?schema=public
+      JWT_SECRET: frota-jsl-secret-change-in-production
+      PORT: 4000
+      UPLOAD_DIR: /app/uploads
+      CORS_ORIGIN: http://localhost:5173
+    volumes:
+      - frota_uploads:/app/uploads
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: frota_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  frota_pgdata:
+  frota_uploads:

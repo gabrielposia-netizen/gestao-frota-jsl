@@ -1,0 +1,459 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Identidade JSL (site oficial) — vermelho institucional */
+  --jsl-red: #e30613;
+  --jsl-red-dark: #b80510;
+  --jsl-red-soft: #ffe5e7;
+  --jsl-ink: #1a1a1a;
+  --jsl-gray: #5c5c5c;
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --border: #e2e2e2;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --brand: #e30613;
+  --brand-2: #1a1a1a;
+  --accent: #e30613;
+  --danger: #e30613;
+  --ok: #1f8a4c;
+  --warn: #c47f17;
+}
+
+.dark {
+  --jsl-red: #ff3b45;
+  --jsl-red-dark: #e30613;
+  --jsl-red-soft: #3a1215;
+  --jsl-ink: #f5f5f5;
+  --jsl-gray: #b0b0b0;
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface-2: #242424;
+  --border: #333333;
+  --text: #f5f5f5;
+  --muted: #a3a3a3;
+  --brand: #ff3b45;
+  --brand-2: #ffffff;
+  --accent: #ff3b45;
+  --danger: #ff3b45;
+  --ok: #3dd68c;
+  --warn: #f5a524;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Montserrat", "IBM Plex Sans", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3, .font-display {
+  font-family: "Montserrat", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.6rem 1.15rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--jsl-red);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--jsl-red-dark);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: white;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.btn-danger {
+  background: color-mix(in oklab, var(--jsl-red) 12%, transparent);
+  color: var(--jsl-red);
+  border-color: color-mix(in oklab, var(--jsl-red) 35%, transparent);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.brand-mark-badge {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 999px;
+  background: white;
+  color: var(--jsl-red);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.72rem;
+  letter-spacing: -0.04em;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.brand-swoosh {
+  position: absolute;
+  left: -8%;
+  top: 8%;
+  width: 48%;
+  height: 110%;
+  background: var(--jsl-red);
+  border-radius: 0 55% 45% 0 / 0 40% 60% 0;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.highlight-chip {
+  display: inline-block;
+  background: var(--jsl-red);
+  color: white;
+  padding: 0.08em 0.28em;
+  line-height: 1.15;
+}
+
+.jsl-header {
+  background: var(--jsl-red);
+  color: white;
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.65rem 0.8rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--jsl-red);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--jsl-red) 18%, transparent);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  padding: 0.18rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.table-wrap { overflow: auto; }
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+table.data th, table.data td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+table.data th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  background: var(--surface-2);
+  font-weight: 700;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  z-index: 0;
+}
+
+.tv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.35);
+  animation: pulseSoft 1.4s ease-in-out infinite;
+}
+
+.nav-active {
+  background: var(--jsl-red-soft);
+  color: var(--jsl-red);
+}
+.dark .nav-active {
+  background: color-mix(in oklab, var(--jsl-red) 22%, transparent);
+  color: #ff8a90;
+}
+
+/* Interatividade */
+.card-interactive {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(227, 6, 19, 0.12);
+  border-color: color-mix(in oklab, var(--jsl-red) 35%, var(--border));
+}
+
+.row-interactive {
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.row-interactive:hover {
+  background: color-mix(in oklab, var(--jsl-red) 5%, transparent);
+}
+
+.btn {
+  transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 18px rgba(227, 6, 19, 0.28);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.45s ease both;
+}
+.animate-fade-in {
+  animation: fadeIn 0.25s ease both;
+}
+.animate-scale-in {
+  animation: scaleIn 0.28s ease both;
+}
+.icon-bob {
+  animation: bob 2.2s ease-in-out infinite;
+}
+
+.stagger-children > * {
+  animation: fadeUp 0.4s ease both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.14s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.18s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.22s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.26s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.3s; }
+
+.progress-fill {
+  transition: width 0.6s ease;
+}
+
+/* Painel TV — fundo logístico animado (suave) */
+.tv-motion-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tv-motion-base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 500px at 15% 20%, rgba(227, 6, 19, 0.05), transparent 60%),
+    radial-gradient(800px 480px at 85% 75%, rgba(120, 120, 120, 0.08), transparent 55%),
+    linear-gradient(160deg, #ececec 0%, #e6e6e6 45%, #e2e2e2 100%);
+}
+
+.tv-motion-grid {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(120, 120, 120, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 120, 120, 0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  animation: tvGridDrift 48s linear infinite;
+}
+
+.tv-motion-routes {
+  position: absolute;
+  inset: 0;
+}
+
+.tv-motion-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tv-route {
+  stroke-linecap: round;
+  animation: tvDashMove 28s linear infinite;
+}
+
+.tv-route-b { animation-duration: 36s; animation-direction: reverse; }
+.tv-route-c { animation-duration: 42s; }
+.tv-route-d { animation-duration: 32s; animation-direction: reverse; }
+
+.tv-hub {
+  fill: #e30613;
+  opacity: 0.35;
+}
+
+.tv-hub-ring {
+  fill: none;
+  stroke: #e30613;
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: tvHubPulse 5.5s ease-out infinite;
+}
+
+.tv-hub-ring-delay { animation-delay: 1.8s; }
+.tv-hub-ring-delay-2 { animation-delay: 3.2s; }
+
+.tv-truck-1 {
+  offset-path: path('M-80 220 C 220 180, 420 320, 680 260 S 1100 140, 1520 210');
+  offset-rotate: auto;
+  animation: tvTruckRide 38s linear infinite;
+}
+
+.tv-truck-2 {
+  offset-path: path('M-60 520 C 260 460, 480 610, 760 540 S 1180 430, 1500 500');
+  offset-rotate: auto;
+  animation: tvTruckRide 52s linear infinite reverse;
+  animation-delay: -12s;
+}
+
+.tv-motion-glow {
+  position: absolute;
+  width: 42vw;
+  height: 42vw;
+  left: -8%;
+  top: 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(227, 6, 19, 0.07), transparent 70%);
+  animation: tvGlowFloat 18s ease-in-out infinite;
+}
+
+.tv-motion-fog {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(232, 232, 232, 0.55) 0%, transparent 18%, transparent 82%, rgba(232, 232, 232, 0.65) 100%),
+    linear-gradient(90deg, rgba(232, 232, 232, 0.4) 0%, transparent 12%, transparent 88%, rgba(232, 232, 232, 0.45) 100%);
+}
+
+@keyframes tvDashMove {
+  to { stroke-dashoffset: -420; }
+}
+
+@keyframes tvGridDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-56px, -56px, 0); }
+}
+
+@keyframes tvHubPulse {
+  0% { opacity: 0.35; transform: scale(0.55); }
+  70% { opacity: 0; transform: scale(1.55); }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+@keyframes tvTruckRide {
+  0% { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+@keyframes tvGlowFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(12%, 8%) scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-motion-grid,
+  .tv-route,
+  .tv-hub-ring,
+  .tv-truck-1,
+  .tv-truck-2,
+  .tv-motion-glow {
+    animation: none !important;
+  }
+}
+
+

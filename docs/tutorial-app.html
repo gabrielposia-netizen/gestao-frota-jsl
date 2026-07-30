@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial — Gestão de Frota JSL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root { --jsl:#e30613; --bg:#f5f5f5; --ink:#1a1a1a; --muted:#666; }
+    *{box-sizing:border-box} body{margin:0;font-family:Montserrat,system-ui,sans-serif;background:#111;color:var(--ink)}
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    .player{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .stage{position:relative;aspect-ratio:16/9;background:#1a1a1a;color:#fff;display:flex;align-items:center;justify-content:center;padding:40px}
+    .stage h1{font-size:clamp(28px,4vw,48px);text-transform:uppercase;font-weight:900;max-width:16ch;line-height:1.05}
+    .stage p{margin-top:14px;opacity:.9;max-width:42ch;line-height:1.5}
+    .badge{display:inline-block;background:var(--jsl);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+    .controls{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid #eee;background:#fafafa}
+    button{border:0;border-radius:999px;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;background:var(--jsl);color:#fff;font-size:12px}
+    button.ghost{background:#ececec;color:#222}
+    .bar{height:4px;background:#eee}.fill{height:100%;background:var(--jsl);width:0%;transition:width .25s}
+    .script{margin-top:18px;background:#fff;border-radius:16px;padding:18px;color:var(--muted);line-height:1.55}
+    .script h2{color:var(--ink);font-size:16px;text-transform:uppercase;margin:0 0 8px}
+    code{background:#f0f0f0;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="player">
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="stage" id="stage"></div>
+      <div class="controls">
+        <button class="ghost" id="prev">Anterior</button>
+        <div id="counter">1</div>
+        <div>
+          <button class="ghost" id="play">Play auto</button>
+          <button id="next">Próximo</button>
+        </div>
+      </div>
+    </div>
+    <div class="script">
+      <h2>Roteiro do vídeo tutorial</h2>
+      <p>Use este player em tela cheia (F11) para gravar a tela, ou abra o MP4 em <code>docs/video/tutorial-gestao-frota.mp4</code> após a geração.</p>
+      <p><strong>Narração sugerida:</strong> “Este é o Gestão de Frota JSL. No dashboard acompanhamos disponibilidade, manutenção e custos. Nos indicadores, um clique filtra os veículos. Em abastecimento anexamos comprovante e cartão. Em manutenção, a nota fiscal. Em avarias, as fotos. O painel TV mostra a frota disponível em tempo real.”</p>
+    </div>
+  </div>
+  <script>
+    const scenes = [
+      { badge:'Introdução', title:'Gestão de Frota JSL', text:'Sistema interno para controlar veículos, custos e operação logística no dia a dia.' },
+      { badge:'Acesso', title:'Entre com seu perfil', text:'Admin, Supervisor ou Operador. Ex.: admin@frota.jsl / admin123' },
+      { badge:'Dashboard', title:'Indicadores em um clique', text:'Clique em Em manutenção ou Parados para ver exatamente quais veículos estão naquele status.' },
+      { badge:'Operação', title:'Entrada, saída e checklist', text:'Registre uso do veículo e faça checklist pré/pós uso ou de turno pelo celular.' },
+      { badge:'Custos', title:'Abastecimento e manutenção', text:'Anexe comprovante e informe o cartão. Na manutenção, anexe a nota fiscal e solicite aprovação.' },
+      { badge:'Qualidade', title:'Avarias com fotos', text:'Registre avarias com imagens e acompanhe a resolução pela liderança.' },
+      { badge:'Painel TV', title:'Disponibilidade em tempo real', text:'Exiba a frota disponível no pátio ou sala de operação, com atualização automática.' },
+      { badge:'Gestão', title:'Relatórios e governança', text:'Exporte PDF/Excel, acompanhe vencimentos e mantenha o histórico completo por placa.' },
+    ];
+    let i = 0, timer = null;
+    const stage = document.getElementById('stage');
+    const fill = document.getElementById('fill');
+    const counter = document.getElementById('counter');
+    function render(){
+      const s = scenes[i];
+      stage.innerHTML = `<div><div class="badge">${s.badge}</div><h1>${s.title}</h1><p>${s.text}</p></div>`;
+      counter.textContent = `${i+1} / ${scenes.length}`;
+      fill.style.width = `${((i+1)/scenes.length)*100}%`;
+    }
+    document.getElementById('next').onclick = () => { i = Math.min(scenes.length-1, i+1); render(); };
+    document.getElementById('prev').onclick = () => { i = Math.max(0, i-1); render(); };
+    document.getElementById('play').onclick = () => {
+      if (timer) { clearInterval(timer); timer=null; document.getElementById('play').textContent='Play auto'; return; }
+      document.getElementById('play').textContent='Pausar';
+      timer = setInterval(() => { i = (i+1) % scenes.length; render(); }, 4000);
+    };
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+uploads/
+.env
+*.log
+.DS_Store
+coverage/
+.vite/
+.pgdata/
+backend/.pgdata/
+backend/src/.pgdata/
+*.db
+*.db-journal

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Frota JSL — Apresentação Executiva</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --jsl-red: #e30613;
+      --ink: #1a1a1a;
+      --muted: #5c5c5c;
+      --bg: #f4f4f4;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Montserrat, system-ui, sans-serif;
+      background: #111;
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .deck { height: 100vh; width: 100vw; position: relative; }
+    .slide {
+      display: none;
+      height: 100%;
+      width: 100%;
+      padding: 48px 64px;
+      background: var(--white);
+      position: absolute;
+      inset: 0;
+      animation: fade .35s ease;
+    }
+    .slide.active { display: flex; flex-direction: column; }
+    .slide.hero {
+      background:
+        linear-gradient(120deg, rgba(227,6,19,.92) 0%, rgba(227,6,19,.75) 42%, rgba(20,20,20,.55) 100%),
+        url('/jsl-hero.png') center/cover;
+      color: white;
+      justify-content: flex-end;
+    }
+    .slide.dark { background: #1a1a1a; color: white; }
+    .brand {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
+    }
+    .brand img { height: 52px; }
+    .eyebrow {
+      text-transform: uppercase; letter-spacing: .18em; font-size: 12px;
+      font-weight: 700; color: var(--jsl-red); margin-bottom: 12px;
+    }
+    .slide.hero .eyebrow, .slide.dark .eyebrow { color: rgba(255,255,255,.8); }
+    h1 {
+      font-size: clamp(32px, 5vw, 56px); font-weight: 900; text-transform: uppercase;
+      letter-spacing: -.02em; line-height: 1.05; max-width: 16ch;
+    }
+    h2 {
+      font-size: clamp(26px, 3.5vw, 40px); font-weight: 800; text-transform: uppercase;
+      letter-spacing: -.02em; margin-bottom: 18px;
+    }
+    .lead { font-size: 18px; line-height: 1.55; max-width: 58ch; color: inherit; opacity: .92; }
+    .chip {
+      display: inline-block; background: white; color: var(--jsl-red);
+      padding: .08em .28em; line-height: 1.1;
+    }
+    .grid { display: grid; gap: 16px; margin-top: 24px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .card {
+      background: #f7f7f7; border: 1px solid #e6e6e6; border-radius: 16px; padding: 20px;
+    }
+    .slide.dark .card { background: #242424; border-color: #333; }
+    .card h3 { font-size: 15px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; color: var(--jsl-red); }
+    .card p, .card li { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .slide.dark .card p, .slide.dark .card li { color: #cfcfcf; }
+    .kpi { text-align: left; }
+    .kpi .n { font-size: 36px; font-weight: 900; color: var(--jsl-red); }
+    .kpi .l { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-top: 4px; }
+    ul { padding-left: 18px; }
+    li { margin: 8px 0; }
+    .footer-nav {
+      position: fixed; left: 0; right: 0; bottom: 0; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; background: rgba(255,255,255,.92); border-top: 1px solid #e5e5e5;
+      backdrop-filter: blur(8px); z-index: 20; color: var(--ink);
+    }
+    .footer-nav button {
+      border: 0; background: var(--jsl-red); color: white; border-radius: 999px;
+      padding: 10px 18px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+      cursor: pointer; font-size: 12px;
+    }
+    .footer-nav button.ghost { background: #eee; color: #222; }
+    .progress {
+      position: fixed; top: 0; left: 0; height: 4px; background: var(--jsl-red); z-index: 30;
+    }
+    .access-box {
+      margin-top: 24px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+      border-radius: 16px; padding: 16px 18px; max-width: 640px;
+    }
+    .access-box code {
+      display: block; margin-top: 8px; font-size: 15px; word-break: break-all;
+    }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+    @media (max-width: 900px) {
+      .slide { padding: 28px 20px 80px; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <section class="slide hero active">
+      <div>
+        <div class="brand"><img src="../frontend/public/jsl-logo.png" alt="JSL" /></div>
+        <div class="eyebrow">Apresentação executiva · Operação interna</div>
+        <h1>Gestão de Frota <span class="chip">JSL</span></h1>
+        <p class="lead" style="margin-top:16px;">Sistema web para controlar veículos, motoristas, manutenções, abastecimentos e indicadores em tempo real — pensado para o dia a dia da logística.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Contexto</div>
+      <h2>O desafio operacional</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Antes</h3>
+          <ul>
+            <li>Informações espalhadas em planilhas e WhatsApp</li>
+            <li>Dificuldade para saber quem usou cada veículo</li>
+            <li>Vencimentos e manutenções reativos</li>
+            <li>Baixa visibilidade da disponibilidade por turno</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Com o sistema</h3>
+          <ul>
+            <li>Fonte única da verdade da frota</li>
+            <li>Histórico completo por placa e motorista</li>
+            <li>Alertas de documentos e aprovações</li>
+            <li>Painel TV e dashboard para gestão</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Objetivo</div>
+      <h2>Entregar velocidade e controle</h2>
+      <div class="grid grid-3">
+        <div class="card kpi"><div class="n">1</div><div class="l">Visão única da frota</div><p style="margin-top:10px">Disponíveis, em uso, parados e em manutenção.</p></div>
+        <div class="card kpi"><div class="n">2</div><div class="l">Operação sem fricção</div><p style="margin-top:10px">Checklist, entrada/saída e avarias no celular.</p></div>
+        <div class="card kpi"><div class="n">3</div><div class="l">Governança</div><p style="margin-top:10px">Perfis de acesso, anexos e aprovação de manutenção.</p></div>
+      </div>
+    </section>
+
+    <section class="slide dark">
+      <div class="eyebrow">Escopo entregue</div>
+      <h2>Módulos do sistema</h2>
+      <div class="grid grid-4">
+        <div class="card"><h3>Dashboard</h3><p>KPIs clicáveis, gráficos mensais, vencimentos e turnos.</p></div>
+        <div class="card"><h3>Veículos</h3><p>Cadastro completo, QR Code, mapa e histórico de uso.</p></div>
+        <div class="card"><h3>Operação</h3><p>Entrada/saída, checklists, turnos e painel TV.</p></div>
+        <div class="card"><h3>Custos</h3><p>Abastecimento com cartão/comprovante e manutenções com NF.</p></div>
+        <div class="card"><h3>Qualidade</h3><p>Avarias com fotos, pneus e documentos (IPVA/seguro).</p></div>
+        <div class="card"><h3>Acessos</h3><p>Admin, Supervisor e Operador com login seguro.</p></div>
+        <div class="card"><h3>Relatórios</h3><p>Exportação PDF e Excel para a liderança.</p></div>
+        <div class="card"><h3>Identidade</h3><p>Visual alinhado ao site JSL (vermelho institucional).</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Diferenciais</div>
+      <h2>Pensado para a operação JSL</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Recursos específicos</h3>
+          <ul>
+            <li>Empilhadeiras, rebocadores e veículos de apoio</li>
+            <li>Checklist de início/fim de turno</li>
+            <li>Aprovação de manutenção pela liderança</li>
+            <li>Disponibilidade por turno</li>
+            <li>Tempo parado por manutenção</li>
+            <li>Painel TV em tempo real</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Experiência de uso</h3>
+          <ul>
+            <li>Interface responsiva (PC, tablet e celular)</li>
+            <li>Pesquisa rápida por placa/motorista</li>
+            <li>Indicadores clicáveis com filtro imediato</li>
+            <li>Modo escuro e notificações</li>
+            <li>Anexos de comprovantes, NF e fotos</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Tecnologia</div>
+      <h2>Arquitetura moderna e escalável</h2>
+      <div class="grid grid-3">
+        <div class="card"><h3>Front-end</h3><p>React + Vite + Tailwind. Layout responsivo e painel TV.</p></div>
+        <div class="card"><h3>Back-end</h3><p>Node.js + Express (API REST) com autenticação JWT.</p></div>
+        <div class="card"><h3>Dados</h3><p>PostgreSQL + Prisma ORM, com uploads e relatórios.</p></div>
+      </div>
+      <p class="lead" style="margin-top:22px;color:var(--muted)">Pronta para uso interno e evolução para ambiente corporativo (VPN/servidor/cloud).</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Benefícios para a gestão</div>
+      <h2>Impacto esperado</h2>
+      <div class="grid grid-3">
+        <div class="card"><h3>Produtividade</h3><p>Menos tempo procurando informação; mais tempo operando.</p></div>
+        <div class="card"><h3>Controle de custo</h3><p>Visibilidade de combustível, manutenção e tempo parado.</p></div>
+        <div class="card"><h3>Compliance</h3><p>Rastreio de documentos, anexos e responsabilidades.</p></div>
+      </div>
+    </section>
+
+    <section class="slide dark">
+      <div class="eyebrow">Acesso</div>
+      <h2>Como usar agora</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Na web (mesmo PC/rede)</h3>
+          <p>Abra no navegador:</p>
+          <p style="margin-top:10px"><code>http://localhost:5173</code></p>
+          <p style="margin-top:10px">No celular (mesma Wi‑Fi):</p>
+          <p style="margin-top:10px"><code id="lanLink">http://192.168.1.6:5173</code></p>
+        </div>
+        <div class="card">
+          <h3>Logins de demonstração</h3>
+          <ul>
+            <li><strong>Admin:</strong> admin@frota.jsl / admin123</li>
+            <li><strong>Supervisor:</strong> supervisor@frota.jsl / super123</li>
+            <li><strong>Operador:</strong> operador@frota.jsl / oper123</li>
+          </ul>
+        </div>
+      </div>
+      <div class="access-box">
+        <strong>Link público (quando o túnel estiver ativo)</strong>
+        <code id="publicLink">https://gestao-frota-jsl.loca.lt</code>
+      </div>
+    </section>
+
+    <section class="slide hero">
+      <div>
+        <div class="eyebrow">Próximos passos</div>
+        <h1>Pronto para piloto operacional</h1>
+        <p class="lead" style="margin-top:16px;">
+          1) Validar com a liderança · 2) Treinar operadores · 3) Publicar em ambiente interno · 4) Medir disponibilidade e custo.
+        </p>
+        <p class="lead" style="margin-top:18px;font-weight:700;">Entender para atender.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer-nav">
+    <button class="ghost" id="prev">Anterior</button>
+    <div id="counter">1 / 9</div>
+    <button id="next">Próximo</button>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    let i = 0;
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    function render() {
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      counter.textContent = `${i + 1} / ${slides.length}`;
+      progress.style.width = `${((i + 1) / slides.length) * 100}%`;
+    }
+    document.getElementById('next').onclick = () => { i = Math.min(slides.length - 1, i + 1); render(); };
+    document.getElementById('prev').onclick = () => { i = Math.max(0, i - 1); render(); };
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') document.getElementById('next').click();
+      if (e.key === 'ArrowLeft') document.getElementById('prev').click();
+    });
+    render();
+  </script>
+</body>
+</html>

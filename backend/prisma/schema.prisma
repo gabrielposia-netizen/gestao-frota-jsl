@@ -1,0 +1,322 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SUPERVISOR
+  OPERADOR
+}
+
+enum VehicleType {
+  CAMINHAO
+  UTILITARIO
+  EMPILHADEIRA
+  REBOCADOR
+  APOIO
+  OUTRO
+}
+
+enum VehicleStatus {
+  DISPONIVEL
+  EM_USO
+  MANUTENCAO
+  PARADO
+  INATIVO
+}
+
+enum MovementType {
+  SAIDA
+  ENTRADA
+}
+
+enum ChecklistType {
+  PRE_USO
+  POS_USO
+  INICIO_TURNO
+  FIM_TURNO
+}
+
+enum MaintenanceType {
+  PREVENTIVA
+  CORRETIVA
+}
+
+enum MaintenanceStatus {
+  AGENDADA
+  EM_ANDAMENTO
+  AGUARDANDO_APROVACAO
+  APROVADA
+  REJEITADA
+  CONCLUIDA
+  CANCELADA
+}
+
+enum DocumentType {
+  IPVA
+  SEGURO
+  LICENCIAMENTO
+  REVISAO
+  OUTRO
+}
+
+enum NotificationType {
+  VENCIMENTO
+  MANUTENCAO
+  AVARIA
+  SISTEMA
+}
+
+enum ShiftType {
+  MANHA
+  TARDE
+  NOITE
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         Role           @default(OPERADOR)
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  driver       Driver?
+  movements    Movement[]     @relation("MovementUser")
+  checklists   Checklist[]
+  maintenances Maintenance[]  @relation("MaintenanceCreator")
+  approvals    Maintenance[]  @relation("MaintenanceApprover")
+  fuelings     Fueling[]
+  damages      Damage[]
+  notifications Notification[]
+  audits       AuditLog[]
+}
+
+model Driver {
+  id           String     @id @default(cuid())
+  userId       String?    @unique
+  user         User?      @relation(fields: [userId], references: [id])
+  name         String
+  cpf          String     @unique
+  cnh          String
+  cnhCategory  String
+  cnhExpiry    DateTime
+  phone        String?
+  sector       String?
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  movements    Movement[]
+  checklists   Checklist[]
+  fuelings     Fueling[]
+  damages      Damage[]
+}
+
+model Vehicle {
+  id              String           @id @default(cuid())
+  plate           String           @unique
+  model           String
+  manufacturer    String
+  year            Int
+  renavam         String?
+  chassis         String?
+  sector          String?
+  type            VehicleType      @default(CAMINHAO)
+  status          VehicleStatus    @default(DISPONIVEL)
+  odometerKm      Float            @default(0)
+  fuelType        String?
+  capacityLiters  Float?
+  photoUrl        String?
+  qrCodeData      String?
+  currentLat      Float?
+  currentLng      Float?
+  locationLabel   String?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  documents       VehicleDocument[]
+  photos          VehiclePhoto[]
+  movements       Movement[]
+  checklists      Checklist[]
+  fuelings        Fueling[]
+  maintenances    Maintenance[]
+  tires           Tire[]
+  damages         Damage[]
+  shiftAvail      ShiftAvailability[]
+}
+
+model VehicleDocument {
+  id         String       @id @default(cuid())
+  vehicleId  String
+  vehicle    Vehicle      @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  type       DocumentType
+  number     String?
+  issuer     String?
+  issueDate  DateTime?
+  expiryDate DateTime
+  fileUrl    String?
+  notes      String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model VehiclePhoto {
+  id        String   @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String?
+  createdAt DateTime @default(now())
+}
+
+model Movement {
+  id            String       @id @default(cuid())
+  vehicleId     String
+  vehicle       Vehicle      @relation(fields: [vehicleId], references: [id])
+  driverId      String?
+  driver        Driver?      @relation(fields: [driverId], references: [id])
+  userId        String
+  user          User         @relation("MovementUser", fields: [userId], references: [id])
+  type          MovementType
+  odometerKm    Float?
+  purpose       String?
+  notes         String?
+  occurredAt    DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+}
+
+model Checklist {
+  id          String        @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle       @relation(fields: [vehicleId], references: [id])
+  driverId    String?
+  driver      Driver?       @relation(fields: [driverId], references: [id])
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  type        ChecklistType
+  shift       ShiftType?
+  items       Json
+  approved    Boolean       @default(true)
+  notes       String?
+  odometerKm  Float?
+  createdAt   DateTime      @default(now())
+}
+
+model Fueling {
+  id           String   @id @default(cuid())
+  vehicleId    String
+  vehicle      Vehicle  @relation(fields: [vehicleId], references: [id])
+  driverId     String?
+  driver       Driver?  @relation(fields: [driverId], references: [id])
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  liters       Float
+  unitPrice    Float
+  totalCost    Float
+  odometerKm   Float?
+  station      String?
+  creditCard   String?
+  receiptUrl   String?
+  fueledAt     DateTime @default(now())
+  notes        String?
+  createdAt    DateTime @default(now())
+}
+
+model Maintenance {
+  id              String            @id @default(cuid())
+  vehicleId       String
+  vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
+  createdById     String
+  createdBy       User              @relation("MaintenanceCreator", fields: [createdById], references: [id])
+  approvedById    String?
+  approvedBy      User?             @relation("MaintenanceApprover", fields: [approvedById], references: [id])
+  type            MaintenanceType
+  status          MaintenanceStatus @default(AGENDADA)
+  title           String
+  description     String?
+  cost            Float?
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  downtimeHours   Float?
+  workshop        String?
+  invoiceUrl      String?
+  approvalNote    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Tire {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  position    String
+  brand       String?
+  model       String?
+  serial      String?
+  installedAt DateTime?
+  treadDepth  Float?
+  pressurePsi Float?
+  status      String   @default("OK")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Damage {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  driverId    String?
+  driver      Driver?  @relation(fields: [driverId], references: [id])
+  reportedById String
+  reportedBy  User     @relation(fields: [reportedById], references: [id])
+  description String
+  severity    String   @default("MEDIA")
+  photoUrls   Json?
+  resolved    Boolean  @default(false)
+  reportedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+
+model ShiftAvailability {
+  id            String         @id @default(cuid())
+  vehicleId     String
+  vehicle       Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  shift         ShiftType
+  date          DateTime       @db.Date
+  status        VehicleStatus
+  notes         String?
+  createdAt     DateTime       @default(now())
+
+  @@unique([vehicleId, shift, date])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  meta      Json?
+  createdAt DateTime @default(now())
+}
