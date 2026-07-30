@@ -1,40 +1,31 @@
 # Publicação em nuvem (24h online)
 
-Este projeto está preparado para rodar **sempre online** em um servidor na nuvem (não depende do seu PC).
+**Status:** publicado na Railway.
 
-## Opção recomendada: Render (1 clique pelo GitHub)
+**URL permanente:** https://web-production-b3ca4.up.railway.app  
 
-1. Acesse: https://dashboard.render.com/select-repo?type=blueprint  
-2. Conecte a conta GitHub `gabrielposia-netizen`  
-3. Selecione o repositório **gestao-frota-jsl**  
-4. Confirme o Blueprint (`render.yaml`)  
-5. Clique em **Apply**
-
-O Render cria:
-- PostgreSQL na nuvem  
-- App web (frontend + API juntos)  
-
-Ao final, você recebe uma URL permanente, por exemplo:
-
-`https://gestao-frota-jsl.onrender.com`
+Painel: https://railway.com/project/67c44ff9-1be6-4dc9-af1b-5ec32937707c
 
 ### Login demo
 - admin@frota.jsl / admin123  
 
-### Observações do plano Free do Render
-- O Web Service pode “dormir” após ~15 min sem acesso (~30–60s para acordar).
-- O Postgres Free expira em **30 dias** (depois precisa upgrade ou recriar).
-- Para **ficar acordado 24h** de verdade: no painel, mude o Web Service para **Starter** (pago) e o banco para um plano pago.
-
-## Opção alternativa: Railway
+## Redeploy (quando alterar o código)
 
 ```bash
-npm i -g @railway/cli
-railway login
-railway init
-railway add --database postgres
-railway up
+railway up --service web
 ```
+
+Ou conecte o repositório GitHub no serviço `web` para deploy automático a cada push.
+
+## Opção alternativa: Render
+
+1. Acesse: https://dashboard.render.com/select-repo?type=blueprint  
+2. Selecione o repositório **gestao-frota-jsl**  
+3. Confirme o Blueprint (`render.yaml`) → **Apply**
+
+### Observações de plano
+- Railway: confira créditos/trial no painel (`sleepApplication` está desligado neste deploy).  
+- Render Free: o Web Service pode dormir após ~15 min; Postgres Free expira em 30 dias.
 
 ## O que muda na arquitetura
 
@@ -47,7 +38,7 @@ railway up
 
 ## Segurança básica em produção
 
-- `JWT_SECRET` gerado automaticamente no Render  
+- `JWT_SECRET` definido no serviço Railway  
 - Senhas com bcrypt  
 - HTTPS no domínio do provedor  
 - Recomendado: trocar senhas demo após a apresentação  
