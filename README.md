@@ -6,11 +6,11 @@ Sistema interno de gestão de frota para operação logística — controle de v
 
 | Canal | URL |
 |-------|-----|
-| **Nuvem 24h** | Publique no Render — veja [`docs/DEPLOY.md`](docs/DEPLOY.md) |
-| Acesso local / túnel | [`docs/ACESSOS.md`](docs/ACESSOS.md) |
+| **Online 24h (PC e celular)** | https://web-production-b3ca4.up.railway.app |
+| Página de acesso | https://web-production-b3ca4.up.railway.app/acesso.html |
+| Login | https://web-production-b3ca4.up.railway.app/login |
 
-Detalhes em [`docs/ACESSOS.md`](docs/ACESSOS.md).
-
+Detalhes em [`docs/ACESSOS.md`](docs/ACESSOS.md). Deploy: [`docs/DEPLOY.md`](docs/DEPLOY.md).
 ## Materiais para gerência
 
 - [`docs/apresentacao-gerencia.html`](docs/apresentacao-gerencia.html) — apresentação executiva (setas do teclado)
