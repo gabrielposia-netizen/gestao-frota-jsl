@@ -90,7 +90,9 @@ export default function DamagesPage() {
               {vehicles.map((v) => <option key={v.id} value={v.id}>{v.plate}</option>)}
             </select>
           </Field>
-          <Field label="Descrição"><textarea className="textarea" required rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
+          <Field label="Descrição">
+            <textarea className="textarea" required rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          </Field>
           <Field label="Severidade">
             <select className="select" value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}>
               <option value="BAIXA">Baixa</option>
@@ -98,29 +100,36 @@ export default function DamagesPage() {
               <option value="ALTA">Alta</option>
             </select>
           </Field>
-          <Field label="Anexar fotos da avaria">
-            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border)] p-4 cursor-pointer hover:border-[var(--jsl-red)] hover:bg-[var(--jsl-red-soft)] transition">
-              <Camera className="text-[var(--jsl-red)]" />
-              <span className="text-sm font-semibold">Selecionar fotos</span>
-              <span className="text-xs text-[var(--muted)]">JPG, PNG ou WEBP · até 5 arquivos</span>
+
+          <div className="space-y-1.5">
+            <div className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Anexar fotos da avaria</div>
+            <label className="flex items-center gap-3 w-full rounded-xl border border-dashed border-[var(--border)] px-3 py-3 cursor-pointer hover:border-[var(--jsl-red)] hover:bg-[var(--jsl-red-soft)] transition">
+              <span className="inline-grid place-items-center w-10 h-10 rounded-full bg-[var(--jsl-red-soft)] shrink-0">
+                <Camera size={18} className="text-[var(--jsl-red)]" />
+              </span>
+              <span className="min-w-0 text-left">
+                <span className="block text-sm font-semibold leading-tight">Selecionar fotos</span>
+                <span className="block text-xs text-[var(--muted)] mt-0.5">JPG, PNG ou WEBP · até 5 arquivos</span>
+              </span>
               <input
-                className="hidden"
+                className="sr-only"
                 type="file"
                 accept="image/*"
                 multiple
                 capture="environment"
-                onChange={(e) => setFiles(e.target.files || [])}
+                onChange={(e) => setFiles(Array.from(e.target.files || []).slice(0, 5))}
               />
             </label>
             {previews.length > 0 && (
-              <div className="flex gap-2 overflow-auto mt-2">
+              <div className="grid grid-cols-3 gap-2 pt-1">
                 {previews.map((p) => (
-                  <img key={p.url} src={p.url} alt={p.name} className="h-20 w-28 object-cover rounded-lg border border-[var(--border)]" />
+                  <img key={p.url} src={p.url} alt={p.name} className="h-24 w-full object-cover rounded-lg border border-[var(--border)]" />
                 ))}
               </div>
             )}
-          </Field>
-          <div className="flex justify-end gap-2">
+          </div>
+
+          <div className="flex justify-end gap-2 pt-1">
             <button type="button" className="btn btn-secondary" onClick={() => setOpen(false)}>Cancelar</button>
             <button className="btn btn-primary">Salvar</button>
           </div>

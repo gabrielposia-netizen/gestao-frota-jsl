@@ -5,11 +5,19 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: true, // libera acesso na rede local (celular)
+    host: true,
     port: 5173,
+    // Permite acesso via Cloudflare Tunnel / celular / qualquer host
+    allowedHosts: true,
     proxy: {
-      '/api': 'http://localhost:4000',
-      '/uploads': 'http://localhost:4000',
+      '/api': {
+        target: 'http://127.0.0.1:4000',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://127.0.0.1:4000',
+        changeOrigin: true,
+      },
     },
   },
 });

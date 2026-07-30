@@ -1,32 +1,33 @@
-# Como acessar o Gestão de Frota JSL
+# Acesso — Gestão de Frota JSL
 
-## Links rápidos
+## Online 24h (nuvem) — recomendado
 
-| Canal | Link |
-|-------|------|
-| **Web (neste PC)** | http://localhost:5173 |
-| **Celular (mesma Wi‑Fi)** | http://192.168.1.6:5173 |
-| **Internet (túnel público)** | https://gestao-frota-jsl.loca.lt |
+Para o sistema **não depender do seu PC**, publique no Render:
 
-> O link público funciona enquanto o túnel e o app estiverem rodando neste computador.
-> Na primeira abertura do localtunnel, pode aparecer uma tela de confirmação — clique em **Continue**.
+1. Abra: https://dashboard.render.com/select-repo?type=blueprint  
+2. Conecte o GitHub e escolha o repositório **gestao-frota-jsl**  
+3. Confirme o Blueprint e clique em **Apply**  
+4. Ao terminar o deploy, a URL permanente aparece no painel (ex.: `https://gestao-frota-jsl.onrender.com`)
 
-## Logins de demonstração
+Guia completo: [`docs/DEPLOY.md`](DEPLOY.md)
 
-| Perfil | E-mail | Senha |
-|--------|--------|-------|
-| Administrador | admin@frota.jsl | admin123 |
-| Supervisor | supervisor@frota.jsl | super123 |
-| Operador | operador@frota.jsl | oper123 |
+### Login demo
+- E-mail: `admin@frota.jsl`
+- Senha: `admin123`
 
-## Materiais para a gerência
+> No plano Free do Render o app pode “dormir” após ~15 min sem uso. Para ficar acordado o tempo todo, use o plano **Starter**.
 
-- Apresentação executiva: `docs/apresentacao-gerencia.html` (abra no navegador, use setas ← →)
-- Tutorial interativo: `docs/tutorial-app.html`
-- Vídeo tutorial: `docs/video/tutorial-gestao-frota.mp4`
+## Túnel temporário (PC ligado)
 
-## Subir o túnel novamente
+Enquanto a nuvem não estiver publicada, dá para usar túnel Cloudflare (só funciona com o PC ligado):
 
 ```bash
-npx localtunnel --port 5173 --subdomain gestao-frota-jsl
+# terminal 1 — frontend
+cd frontend
+npm run dev
+
+# terminal 2 — túnel público
+npx cloudflared tunnel --url http://127.0.0.1:5173
 ```
+
+O Cloudflare gera um link `https://....trycloudflare.com` a cada execução.

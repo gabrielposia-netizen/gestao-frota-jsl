@@ -6,9 +6,8 @@ Sistema interno de gestão de frota para operação logística — controle de v
 
 | Canal | URL |
 |-------|-----|
-| Web (PC local) | http://localhost:5173 |
-| Celular (mesma Wi‑Fi) | http://192.168.1.6:5173 |
-| Internet (túnel) | https://gestao-frota-jsl.loca.lt |
+| **Nuvem 24h** | Publique no Render — veja [`docs/DEPLOY.md`](docs/DEPLOY.md) |
+| Acesso local / túnel | [`docs/ACESSOS.md`](docs/ACESSOS.md) |
 
 Detalhes em [`docs/ACESSOS.md`](docs/ACESSOS.md).
 
