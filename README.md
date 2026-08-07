@@ -6,9 +6,9 @@ Sistema interno de gestão de frota para operação logística — controle de v
 
 | Canal | URL |
 |-------|-----|
-| **Online 24h (PC e celular)** | https://web-production-b3ca4.up.railway.app |
-| Página de acesso | https://web-production-b3ca4.up.railway.app/acesso.html |
-| Login | https://web-production-b3ca4.up.railway.app/login |
+| **Online (Vercel)** | https://gestao-frota-jsl.vercel.app |
+| Página de acesso | https://gestao-frota-jsl.vercel.app/acesso.html |
+| Login | https://gestao-frota-jsl.vercel.app/login |
 
 Detalhes em [`docs/ACESSOS.md`](docs/ACESSOS.md). Deploy: [`docs/DEPLOY.md`](docs/DEPLOY.md).
 ## Materiais para gerência

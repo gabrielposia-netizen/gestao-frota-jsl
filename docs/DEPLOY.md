@@ -1,44 +1,33 @@
-# Publicação em nuvem (24h online)
+# Publicação em nuvem
 
-**Status:** publicado na Railway.
+**Status:** online
 
-**URL permanente:** https://web-production-b3ca4.up.railway.app  
-
-Painel: https://railway.com/project/67c44ff9-1be6-4dc9-af1b-5ec32937707c
+| Camada | Onde | URL |
+|--------|------|-----|
+| Frontend | **Vercel** | https://gestao-frota-jsl.vercel.app |
+| API + Postgres | Railway | https://web-production-5d52d3.up.railway.app |
 
 ### Login demo
 - admin@frota.jsl / admin123  
 
-## Redeploy (quando alterar o código)
+O Vercel serve o frontend e encaminha `/api` e `/uploads` para a Railway (`frontend/vercel.json`).
+
+## Redeploy frontend (Vercel)
+
+```bash
+cd frontend
+npx vercel --prod --yes
+```
+
+## Redeploy API (Railway)
 
 ```bash
 railway up --service web
+railway domain --service web
 ```
 
-Ou conecte o repositório GitHub no serviço `web` para deploy automático a cada push.
+Atualize o destino em `frontend/vercel.json` se o domínio da Railway mudar, e faça redeploy no Vercel.
 
-## Opção alternativa: Render
-
-1. Acesse: https://dashboard.render.com/select-repo?type=blueprint  
-2. Selecione o repositório **gestao-frota-jsl**  
-3. Confirme o Blueprint (`render.yaml`) → **Apply**
-
-### Observações de plano
-- Railway: confira créditos/trial no painel (`sleepApplication` está desligado neste deploy).  
-- Render Free: o Web Service pode dormir após ~15 min; Postgres Free expira em 30 dias.
-
-## O que muda na arquitetura
-
-| Item | Antes (seu PC) | Agora (nuvem) |
-|------|----------------|---------------|
-| Banco | Pasta local `.pgdata` | PostgreSQL gerenciado |
-| App | Precisa PC ligado | Roda 24h no servidor |
-| Link | Túnel temporário | URL HTTPS permanente |
-| Dados | Somente no seu HD | No provedor da nuvem |
-
-## Segurança básica em produção
-
-- `JWT_SECRET` definido no serviço Railway  
-- Senhas com bcrypt  
-- HTTPS no domínio do provedor  
-- Recomendado: trocar senhas demo após a apresentação  
+## Observações de plano
+- Vercel Hobby: frontend sempre online.  
+- Railway: API/banco usam crédito do trial/plano — confira o painel. Para pausar: `railway down --service web` e `railway down --service Postgres`.
