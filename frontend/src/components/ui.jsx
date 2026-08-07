@@ -12,7 +12,7 @@ export function PageHeader({ title, subtitle, actions }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 animate-fade-up">
       <div>
-        <h1 className="font-display text-2xl md:text-3xl font-extrabold uppercase tracking-tight">{title}</h1>
+        <h1 className="font-display text-2xl md:text-[1.55rem] font-bold tracking-tight">{title}</h1>
         {subtitle && <p className="text-[var(--muted)] mt-1">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
