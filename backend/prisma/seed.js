@@ -57,21 +57,42 @@ async function clearDemoData() {
 async function ensureBootstrapAdmin() {
   const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || 'admin@frota.local').toLowerCase();
   const matricula = (process.env.BOOTSTRAP_ADMIN_MATRICULA || 'ADMIN').toUpperCase();
-  const password = process.env.BOOTSTRAP_ADMIN_PASSWORD || 'Admin@Frota1';
+  const password = process.env.BOOTSTRAP_ADMIN_PASSWORD || '102511';
   const name = process.env.BOOTSTRAP_ADMIN_NAME || 'Administrador';
+  const passwordHash = await bcrypt.hash(password, 10);
 
-  const existingAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+  const existingAdmin = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { role: 'ADMIN' },
+        { matricula },
+        { email },
+        { matricula: 'ADMIN01' },
+        { email: 'admin@frota.jsl' },
+      ],
+    },
+  });
+
   if (existingAdmin) {
-    console.log(`Admin já existe (${existingAdmin.matricula || existingAdmin.email}).`);
+    await prisma.user.update({
+      where: { id: existingAdmin.id },
+      data: {
+        name,
+        email,
+        matricula,
+        passwordHash,
+        role: 'ADMIN',
+        active: true,
+      },
+    });
+    console.log(`Admin atualizado: matrícula ${matricula}`);
     return;
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.create({
     data: { name, email, matricula, passwordHash, role: 'ADMIN' },
   });
-  console.log(`Admin bootstrap: matrícula ${matricula} | e-mail ${email}`);
-  console.log('Troque a senha após o primeiro acesso.');
+  console.log(`Admin bootstrap: matrícula ${matricula}`);
 }
 
 async function main() {

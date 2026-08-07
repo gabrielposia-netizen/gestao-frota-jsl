@@ -54,7 +54,7 @@ npm run dev
 
 | Perfil | Como obter acesso |
 |--------|-------------------|
-| Administrador | Bootstrap inicial (`ADMIN` / `Admin@Frota1`) — trocar senha |
+| Administrador | Matrícula `ADMIN` / senha `102511` |
 | Supervisor | Cadastro com matrícula de coordenador, supervisor ou líder de manutenção |
 | Operador | Cadastro com matrícula de motorista ou operador de empilhadeira (sem dashboard) |
 

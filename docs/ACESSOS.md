@@ -4,12 +4,9 @@
 
 **https://gestao-frota-jsl.vercel.app**
 
-### Admin bootstrap (primeiro acesso)
+### Admin
 - Matrícula: `ADMIN`
-- E-mail: `admin@frota.local`
-- Senha: `Admin@Frota1`  
-
-Troque a senha após entrar. Demais usuários devem se cadastrar com matrícula do QLP.
+- Senha: `102511`
 
 ### Perfis
 - **Motorista / Operador de empilhadeira:** rotinas operacionais (entrada/saída, checklist, etc.). **Sem dashboard.**
