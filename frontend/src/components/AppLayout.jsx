@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Bell, CalendarClock, ClipboardCheck, Droplets, FileBarChart, Fuel, LayoutDashboard,
-  LogOut, Map, Menu, Moon, Search, Settings, Shield, Sun, Truck, Tv, Users, Wrench, X, AlertTriangle,
+  LogOut, Map, Menu, Moon, Search, Shield, Sun, Truck, Tv, Users, Wrench, X, AlertTriangle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -63,20 +63,69 @@ export default function AppLayout({ children }) {
 
   const visibleLinks = links.filter((l) => !l.roles || can(...l.roles));
 
+  function doLogout() {
+    logout();
+    navigate('/login');
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="jsl-header">
-        <div className="h-10 px-4 md:px-6 flex items-center justify-between text-[11px] uppercase tracking-[0.12em] text-white/85 border-b border-white/15">
-          <span>Gestão de Frota · Operação interna</span>
-          <span className="hidden sm:inline">{ROLE_LABEL[user?.role]}</span>
+    <div className="app-shell">
+      <button className="app-mobile-toggle btn btn-primary lg:hidden" type="button" onClick={() => setOpen(true)} aria-label="Abrir menu">
+        <Menu size={18} />
+      </button>
+
+      <aside className={`sidebar ${open ? 'open' : ''}`}>
+        <div className="brand">
+          <div className="flex items-start justify-between gap-2">
+            <JslLogo compact className="brand-logo !h-10 brightness-110" />
+            <button className="btn btn-ghost p-2 lg:hidden" type="button" onClick={() => setOpen(false)} aria-label="Fechar menu">
+              <X size={16} />
+            </button>
+          </div>
+          <div className="brand-mark">JSL · Entender para Atender</div>
+          <h1>Gestão de Frota</h1>
+          <p>Controle operacional de veículos e indicadores</p>
         </div>
-        <div className="h-16 px-4 md:px-6 flex items-center gap-3">
-          <button className="lg:hidden btn btn-ghost p-2" onClick={() => setOpen(true)}><Menu size={18} /></button>
-          <JslLogo compact className="min-w-0 brightness-110" />
-          <div className="relative flex-1 max-w-xl ml-auto">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
+
+        <nav className="sidebar-nav">
+          {visibleLinks.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+            >
+              <Icon size={18} />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-chip sidebar-user">
+            <Shield size={14} />
+            <span className="truncate">{user?.name?.split(' ')[0]} · {ROLE_LABEL[user?.role] || user?.role}</span>
+          </div>
+          <button className="btn btn-ghost" type="button" onClick={toggle}>
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
+            Modo {dark ? 'claro' : 'escuro'}
+          </button>
+          <button className="btn btn-ghost" type="button" onClick={doLogout}>
+            <LogOut size={16} />
+            Sair
+          </button>
+        </div>
+      </aside>
+
+      {open && <div className="sidebar-backdrop lg:hidden" onClick={() => setOpen(false)} />}
+
+      <main className="main">
+        <div className="topbar">
+          <div className="relative flex-1 max-w-xl">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
             <input
-              className="input pl-9 !bg-white/15 !border-white/25 !text-white placeholder:text-white/60"
+              className="input pl-9"
               placeholder="Pesquisar placa, motorista ou veículo..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -88,6 +137,7 @@ export default function AppLayout({ children }) {
                 {results.vehicles.map((v) => (
                   <button
                     key={v.id}
+                    type="button"
                     className="w-full text-left px-2 py-2 rounded-lg hover:bg-[var(--surface-2)] text-sm"
                     onClick={() => {
                       setQ('');
@@ -102,6 +152,7 @@ export default function AppLayout({ children }) {
                 {results.drivers.map((d) => (
                   <button
                     key={d.id}
+                    type="button"
                     className="w-full text-left px-2 py-2 rounded-lg hover:bg-[var(--surface-2)] text-sm"
                     onClick={() => {
                       setQ('');
@@ -115,110 +166,55 @@ export default function AppLayout({ children }) {
               </div>
             )}
           </div>
-          <div className="relative">
-            <button className="btn btn-ghost p-2 relative" onClick={openNotifications}>
-              <Bell size={17} />
-              {unread > 0 && (
-                <span className="absolute -top-1 -right-1 text-[10px] bg-white text-[var(--jsl-red)] rounded-full min-w-4 h-4 px-1 flex items-center justify-center font-bold">
-                  {unread}
-                </span>
-              )}
-            </button>
-            {showNotifs && (
-              <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-auto card shadow-xl p-2 z-50 text-[var(--text)]">
-                <div className="flex items-center justify-between px-2 py-1 mb-1">
-                  <span className="font-semibold text-sm">Notificações</span>
-                  <button
-                    className="text-xs text-[var(--jsl-red)] font-bold uppercase"
-                    onClick={() => api('/notifications/mark-all-read', { method: 'POST' }).then(() => setUnread(0))}
-                  >
-                    Marcar lidas
-                  </button>
+
+          <div className="topbar-actions">
+            <div className="relative">
+              <button className="btn btn-secondary p-2 relative" type="button" onClick={openNotifications}>
+                <Bell size={17} />
+                {unread > 0 && (
+                  <span className="absolute -top-1 -right-1 text-[10px] bg-[var(--jsl-red)] text-white rounded-full min-w-4 h-4 px-1 flex items-center justify-center font-bold">
+                    {unread}
+                  </span>
+                )}
+              </button>
+              {showNotifs && (
+                <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-auto card shadow-xl p-2 z-50 text-[var(--text)]">
+                  <div className="flex items-center justify-between px-2 py-1 mb-1">
+                    <span className="font-semibold text-sm">Notificações</span>
+                    <button
+                      type="button"
+                      className="text-xs text-[var(--jsl-red)] font-bold"
+                      onClick={() => api('/notifications/mark-all-read', { method: 'POST' }).then(() => setUnread(0))}
+                    >
+                      Marcar lidas
+                    </button>
+                  </div>
+                  {notifs.map((n) => (
+                    <button
+                      key={n.id}
+                      type="button"
+                      className={`w-full text-left px-2 py-2 rounded-lg hover:bg-[var(--surface-2)] ${n.read ? 'opacity-60' : ''}`}
+                      onClick={() => {
+                        api(`/notifications/${n.id}/read`, { method: 'PATCH' });
+                        if (n.link) navigate(n.link);
+                        setShowNotifs(false);
+                      }}
+                    >
+                      <div className="text-sm font-medium">{n.title}</div>
+                      <div className="text-xs text-[var(--muted)]">{n.message}</div>
+                    </button>
+                  ))}
                 </div>
-                {notifs.map((n) => (
-                  <button
-                    key={n.id}
-                    className={`w-full text-left px-2 py-2 rounded-lg hover:bg-[var(--surface-2)] ${n.read ? 'opacity-60' : ''}`}
-                    onClick={() => {
-                      api(`/notifications/${n.id}/read`, { method: 'PATCH' });
-                      if (n.link) navigate(n.link);
-                      setShowNotifs(false);
-                    }}
-                  >
-                    <div className="text-sm font-medium">{n.title}</div>
-                    <div className="text-xs text-[var(--muted)]">{n.message}</div>
-                  </button>
-                ))}
-              </div>
-            )}
+              )}
+            </div>
+            <div className="user-chip hidden sm:inline-flex">
+              {user?.name} · {ROLE_LABEL[user?.role] || user?.role}
+            </div>
           </div>
-          <button className="btn btn-ghost p-2" onClick={toggle} title="Modo escuro">
-            {dark ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
-          <button className="btn btn-ghost p-2 hidden sm:inline-flex" onClick={() => navigate('/usuarios')} title="Configurações">
-            <Settings size={17} />
-          </button>
-          <button
-            className="btn btn-ghost hidden md:inline-flex"
-            onClick={() => {
-              logout();
-              navigate('/login');
-            }}
-          >
-            <LogOut size={15} /> Sair
-          </button>
         </div>
-      </div>
 
-      <div className="flex flex-1 min-h-0">
-        <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-[var(--surface)] border-r border-[var(--border)] lg:static lg:translate-x-0 transition-transform ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="lg:hidden flex items-center justify-between gap-2 bg-[var(--jsl-red)] px-3 py-3">
-            <JslLogo banner className="flex-1 min-w-0" />
-            <button className="btn btn-ghost p-2 shrink-0" onClick={() => setOpen(false)} aria-label="Fechar menu">
-              <X size={16} />
-            </button>
-          </div>
-          <div className="hidden lg:flex items-center bg-[var(--jsl-red)] px-3 py-3">
-            <JslLogo banner />
-          </div>
-          <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100%-5.5rem)] pb-24 lg:pb-3">
-            {visibleLinks.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold uppercase tracking-wide transition ${
-                    isActive
-                      ? 'nav-active'
-                      : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
-                  }`
-                }
-              >
-                <Icon size={17} />
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-          <div className="absolute bottom-0 inset-x-0 p-3 border-t border-[var(--border)] bg-[var(--surface)] lg:hidden">
-            <div className="text-sm font-semibold truncate">{user?.name}</div>
-            <button
-              className="btn btn-secondary w-full mt-2"
-              onClick={() => {
-                logout();
-                navigate('/login');
-              }}
-            >
-              <LogOut size={15} /> Sair
-            </button>
-          </div>
-        </aside>
-
-        {open && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setOpen(false)} />}
-
-        <main className="flex-1 min-w-0 p-4 md:p-6">{children}</main>
-      </div>
+        {children}
+      </main>
     </div>
   );
 }
