@@ -233,7 +233,7 @@ table.data th {
   height: 8px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.35);
+  box-shadow: 0 0 0 4px rgba(236, 31, 40, 0.35);
   animation: pulseSoft 1.4s ease-in-out infinite;
 }
 
@@ -252,7 +252,7 @@ table.data th {
 }
 .card-interactive:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(227, 6, 19, 0.12);
+  box-shadow: 0 12px 28px rgba(236, 31, 40, 0.12);
   border-color: color-mix(in oklab, var(--jsl-red) 35%, var(--border));
 }
 
@@ -273,7 +273,7 @@ table.data th {
   transform: scale(0.97);
 }
 .btn-primary:hover {
-  box-shadow: 0 8px 18px rgba(227, 6, 19, 0.28);
+  box-shadow: 0 8px 18px rgba(236, 31, 40, 0.28);
 }
 
 @keyframes fadeUp {
@@ -335,7 +335,7 @@ table.data th {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(900px 500px at 15% 20%, rgba(227, 6, 19, 0.05), transparent 60%),
+    radial-gradient(900px 500px at 15% 20%, rgba(236, 31, 40, 0.05), transparent 60%),
     radial-gradient(800px 480px at 85% 75%, rgba(120, 120, 120, 0.08), transparent 55%),
     linear-gradient(160deg, #ececec 0%, #e6e6e6 45%, #e2e2e2 100%);
 }
@@ -372,13 +372,13 @@ table.data th {
 .tv-route-d { animation-duration: 32s; animation-direction: reverse; }
 
 .tv-hub {
-  fill: #e30613;
+  fill: #ec1f28;
   opacity: 0.35;
 }
 
 .tv-hub-ring {
   fill: none;
-  stroke: #e30613;
+  stroke: #ec1f28;
   stroke-width: 1.5;
   opacity: 0;
   transform-origin: center;
@@ -409,7 +409,7 @@ table.data th {
   left: -8%;
   top: 18%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(227, 6, 19, 0.07), transparent 70%);
+  background: radial-gradient(circle, rgba(236, 31, 40, 0.07), transparent 70%);
   animation: tvGlowFloat 18s ease-in-out infinite;
 }
 
