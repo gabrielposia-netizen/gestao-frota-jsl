@@ -8,7 +8,7 @@ export const STATUS_LABEL = {
 
 export const STATUS_COLOR = {
   DISPONIVEL: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
-  EM_USO: 'bg-[color-mix(in_oklab,#e30613_12%,transparent)] text-[#b80510] dark:text-[#ff8a90]',
+  EM_USO: 'bg-[color-mix(in_oklab,#ec1f28_12%,transparent)] text-[#b80510] dark:text-[#ff8a90]',
   MANUTENCAO: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
   PARADO: 'bg-rose-500/15 text-rose-700 dark:text-rose-300',
   INATIVO: 'bg-slate-500/15 text-slate-600 dark:text-slate-300',

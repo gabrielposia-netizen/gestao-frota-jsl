@@ -1,104 +1,212 @@
-import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
+import { KeyRound, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 import JslLogo from '../components/JslLogo';
 
-function AuthShell({ title, subtitle, children, footer }) {
-  return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="relative hidden lg:block overflow-hidden bg-[#1a1a1a]">
-        <img src="/jsl-hero.png" alt="Frota JSL" className="absolute inset-0 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
-        <div className="brand-swoosh opacity-90" />
-        <div className="relative z-10 h-full flex flex-col justify-between p-10 text-white">
-          <JslLogo compact className="drop-shadow-md" />
-          <div className="max-w-xl">
-            <h1 className="font-display text-4xl xl:text-5xl font-black uppercase leading-[1.05]">
-              Para cada operação, <span className="highlight-chip">uma JSL</span> diferente.
-            </h1>
-            <p className="mt-5 text-white/90 text-lg max-w-md">
-              Gestão de frota interna com a identidade e a agilidade da operação logística JSL.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center justify-center p-6 bg-[var(--bg)]">
-        <div className="card w-full max-w-md p-6 md:p-8 space-y-4 shadow-lg">
-          <div className="lg:hidden mb-2 rounded-xl overflow-hidden bg-[var(--jsl-red)] px-2 py-2">
-            <JslLogo banner />
-          </div>
-          <div>
-            <div className="font-display text-2xl font-extrabold uppercase tracking-tight">{title}</div>
-            <p className="text-[var(--muted)] text-sm mt-1">{subtitle}</p>
-          </div>
-          {children}
-          {footer}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function LoginPage() {
-  const { login, user, loading } = useAuth();
-  const navigate = useNavigate();
-  const [matricula, setMatricula] = useState('ADMIN01');
-  const [password, setPassword] = useState('admin123');
-  const [error, setError] = useState('');
+  const { login, applySession, user, loading } = useAuth();
+  const [mode, setMode] = useState('login');
+  const [identificador, setIdentificador] = useState('ADMIN01');
+  const [matricula, setMatricula] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('admin123');
+  const [confirma, setConfirma] = useState('');
+  const [erro, setErro] = useState('');
+  const [ok, setOk] = useState('');
   const [busy, setBusy] = useState(false);
 
   if (!loading && user) return <Navigate to="/" replace />;
 
-  async function onSubmit(e) {
+  function switchMode(next) {
+    setMode(next);
+    setErro('');
+    setOk('');
+    setSenha('');
+    setConfirma('');
+    if (next === 'login') setSenha('');
+  }
+
+  async function onLogin(e) {
     e.preventDefault();
+    setErro('');
+    setOk('');
     setBusy(true);
-    setError('');
     try {
-      await login(matricula, password);
-      navigate('/');
+      await login(identificador, senha);
     } catch (err) {
-      setError(err.message);
+      setErro(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onCadastro(e) {
+    e.preventDefault();
+    setErro('');
+    setOk('');
+    if (senha !== confirma) {
+      setErro('As senhas não coincidem.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const data = await api('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ matricula, email, password: senha }),
+      });
+      setOk('Conta criada! Entrando…');
+      applySession(data.token, data.user);
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onRecuperar(e) {
+    e.preventDefault();
+    setErro('');
+    setOk('');
+    if (senha !== confirma) {
+      setErro('As senhas não coincidem.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const data = await api('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ matricula, email, password: senha }),
+      });
+      setOk(data.message || 'Senha redefinida! Faça login com a nova senha.');
+      setMode('login');
+      setIdentificador(matricula);
+      setSenha('');
+      setConfirma('');
+    } catch (err) {
+      setErro(err.message);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <AuthShell title="Entrar" subtitle="Acesso por matrícula da equipe operacional" footer={(
-      <div className="space-y-2 text-sm border-t border-[var(--border)] pt-3">
-        <div className="flex flex-wrap gap-x-3 gap-y-1">
-          <Link className="font-semibold text-[var(--jsl-red)]" to="/cadastro">Criar conta</Link>
-          <Link className="font-semibold text-[var(--jsl-red)]" to="/recuperar-senha">Esqueci a senha</Link>
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-hero">
+          <div className="login-hero-logo">
+            <JslLogo compact className="!h-12 drop-shadow-md" />
+          </div>
+          <div className="text-xs font-bold uppercase tracking-wide opacity-90">Sistema interno · JSL</div>
+          <h1>Gestão de frota operacional</h1>
+          <p>
+            Cadastre-se com sua matrícula do quadro de ativos para controlar veículos, checklists,
+            manutenção e indicadores.
+          </p>
         </div>
-        <p className="text-xs text-[var(--muted)] leading-relaxed">
-          Demo: matrícula <strong>ADMIN01</strong> / admin123 · SUPER01 / super123 · OPER01 / oper123
-        </p>
-      </div>
-    )}>
-      <form onSubmit={onSubmit} className="space-y-4">
-        {error && <div className="rounded-xl bg-[var(--jsl-red-soft)] text-[var(--jsl-red)] px-3 py-2 text-sm font-medium">{error}</div>}
-        <label className="block space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Matrícula</span>
-          <input className="input" value={matricula} onChange={(e) => setMatricula(e.target.value)} required autoComplete="username" />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Senha</span>
-          <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
-        </label>
-        <button className="btn btn-primary w-full py-3.5" disabled={busy}>
-          {busy ? 'Entrando...' : (
-            <>
-              Acessar sistema
-              <span className="inline-grid place-items-center w-6 h-6 rounded-full bg-white/20">
-                <ArrowRight size={14} />
-              </span>
-            </>
+
+        <div className="login-form">
+          <JslLogo className="login-form-logo !h-10" />
+          <div className="login-modes">
+            <button type="button" className={`btn ${mode === 'login' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => switchMode('login')}>
+              <LogIn size={16} /> Entrar
+            </button>
+            <button type="button" className={`btn ${mode === 'cadastro' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => switchMode('cadastro')}>
+              <UserPlus size={16} /> Cadastrar
+            </button>
+            <button type="button" className={`btn ${mode === 'recuperar' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => switchMode('recuperar')}>
+              <KeyRound size={16} /> Recuperar senha
+            </button>
+          </div>
+
+          {mode === 'login' && (
+            <form onSubmit={onLogin}>
+              <h2 className="font-display text-xl font-bold mt-2 mb-1">Login</h2>
+              <p className="text-[var(--muted)] text-sm mt-0 mb-3">Use matrícula (ou e-mail) e a senha cadastrada.</p>
+              <div className="login-field">
+                <label>E-mail ou matrícula</label>
+                <input className="input" value={identificador} onChange={(e) => setIdentificador(e.target.value)} placeholder="matrícula ou e-mail" required autoComplete="username" />
+              </div>
+              <div className="login-field">
+                <label>Senha</label>
+                <input className="input" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required autoComplete="current-password" />
+              </div>
+              {erro && <div className="login-alert">{erro}</div>}
+              {ok && <div className="login-alert ok">{ok}</div>}
+              <button className="btn btn-primary w-full" type="submit" disabled={busy}>
+                {busy ? 'Entrando…' : 'Entrar'}
+              </button>
+              <button type="button" className="btn btn-secondary w-full mt-2" onClick={() => switchMode('recuperar')}>
+                Esqueci minha senha
+              </button>
+              <p className="text-xs text-[var(--muted)] mt-3 leading-relaxed">
+                Demo: <strong>ADMIN01</strong> / admin123 · SUPER01 / super123 · OPER01 / oper123
+              </p>
+            </form>
           )}
-        </button>
-      </form>
-    </AuthShell>
+
+          {mode === 'cadastro' && (
+            <form onSubmit={onCadastro}>
+              <h2 className="font-display text-xl font-bold mt-2 mb-1">Criar conta</h2>
+              <p className="text-[var(--muted)] text-sm mt-0 mb-3">
+                Informe a matrícula do ativo. Nome e perfil vêm do QLP (motorista, empilhadeira, líder de manutenção, coordenador ou supervisor).
+              </p>
+              <div className="login-field">
+                <label>Matrícula</label>
+                <input className="input" value={matricula} onChange={(e) => setMatricula(e.target.value)} required />
+              </div>
+              <div className="login-field">
+                <label>E-mail</label>
+                <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+              <div className="login-field">
+                <label>Senha</label>
+                <input className="input" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} minLength={6} required />
+              </div>
+              <div className="login-field">
+                <label>Confirmar senha</label>
+                <input className="input" type="password" value={confirma} onChange={(e) => setConfirma(e.target.value)} minLength={6} required />
+              </div>
+              {erro && <div className="login-alert">{erro}</div>}
+              {ok && <div className="login-alert ok">{ok}</div>}
+              <button className="btn btn-primary w-full" type="submit" disabled={busy}>
+                {busy ? 'Cadastrando…' : 'Criar conta e entrar'}
+              </button>
+            </form>
+          )}
+
+          {mode === 'recuperar' && (
+            <form onSubmit={onRecuperar}>
+              <h2 className="font-display text-xl font-bold mt-2 mb-1">Recuperar senha</h2>
+              <p className="text-[var(--muted)] text-sm mt-0 mb-3">
+                Informe a matrícula e o e-mail cadastrados para definir uma nova senha.
+              </p>
+              <div className="login-field">
+                <label>Matrícula</label>
+                <input className="input" value={matricula} onChange={(e) => setMatricula(e.target.value)} required />
+              </div>
+              <div className="login-field">
+                <label>E-mail cadastrado</label>
+                <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+              <div className="login-field">
+                <label>Nova senha</label>
+                <input className="input" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} minLength={6} required />
+              </div>
+              <div className="login-field">
+                <label>Confirmar nova senha</label>
+                <input className="input" type="password" value={confirma} onChange={(e) => setConfirma(e.target.value)} minLength={6} required />
+              </div>
+              {erro && <div className="login-alert">{erro}</div>}
+              {ok && <div className="login-alert ok">{ok}</div>}
+              <button className="btn btn-primary w-full" type="submit" disabled={busy}>
+                {busy ? 'Salvando…' : 'Atualizar senha'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
-
-export { AuthShell };

@@ -58,7 +58,7 @@ export default function TvPanelPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div>
               <div className="flex items-center gap-2 text-sm text-[var(--muted)]">
-                <span className="live-dot !bg-[var(--jsl-red)] !shadow-[0_0_0_4px_rgba(227,6,19,0.2)]" />
+                <span className="live-dot !bg-[var(--jsl-red)] !shadow-[0_0_0_4px_rgba(236, 31, 40,0.2)]" />
                 Ao vivo · atualiza a cada 15s
               </div>
               <h1 className="font-display text-3xl md:text-5xl font-black uppercase mt-2 tracking-tight">

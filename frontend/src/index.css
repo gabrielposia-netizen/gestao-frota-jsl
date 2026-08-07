@@ -4,42 +4,43 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Identidade JSL (site oficial) — vermelho institucional */
-  --jsl-red: #e30613;
-  --jsl-red-dark: #b80510;
-  --jsl-red-soft: #ffe5e7;
-  --jsl-ink: #1a1a1a;
-  --jsl-gray: #5c5c5c;
+  /* Identidade JSL — alinhada ao app de férias */
+  --jsl-red: #ec1f28;
+  --jsl-red-dark: #c41820;
+  --jsl-red-soft: #fde8e9;
+  --jsl-ink: #2b2b2b;
+  --jsl-gray: #7c7a7a;
   --bg: #f5f5f5;
   --surface: #ffffff;
-  --surface-2: #f0f0f0;
-  --border: #e2e2e2;
-  --text: #1a1a1a;
+  --surface-2: #ececec;
+  --border: #d4d4d4;
+  --text: #2b2b2b;
   --muted: #6b6b6b;
-  --brand: #e30613;
-  --brand-2: #1a1a1a;
-  --accent: #e30613;
-  --danger: #e30613;
-  --ok: #1f8a4c;
-  --warn: #c47f17;
+  --brand: #ec1f28;
+  --brand-2: #44546a;
+  --accent: #44546a;
+  --danger: #ec1f28;
+  --ok: #2e7d32;
+  --warn: #c79100;
+  --radius: 14px;
 }
 
 .dark {
-  --jsl-red: #ff3b45;
-  --jsl-red-dark: #e30613;
+  --jsl-red: #ff3b44;
+  --jsl-red-dark: #ec1f28;
   --jsl-red-soft: #3a1215;
-  --jsl-ink: #f5f5f5;
-  --jsl-gray: #b0b0b0;
-  --bg: #0f0f0f;
-  --surface: #1a1a1a;
+  --jsl-ink: #f2f2f2;
+  --jsl-gray: #a5a5a5;
+  --bg: #121212;
+  --surface: #1c1c1c;
   --surface-2: #242424;
   --border: #333333;
-  --text: #f5f5f5;
+  --text: #f2f2f2;
   --muted: #a3a3a3;
-  --brand: #ff3b45;
+  --brand: #ff3b44;
   --brand-2: #ffffff;
-  --accent: #ff3b45;
-  --danger: #ff3b45;
+  --accent: #ff3b44;
+  --danger: #ff3b44;
   --ok: #3dd68c;
   --warn: #f5a524;
 }
@@ -52,20 +53,20 @@ html, body, #root {
 
 body {
   margin: 0;
-  font-family: "Montserrat", "IBM Plex Sans", system-ui, sans-serif;
+  font-family: "Segoe UI", "Source Sans 3", system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
 
 h1, h2, h3, .font-display {
-  font-family: "Montserrat", system-ui, sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
   letter-spacing: -0.02em;
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
 }
 
 .btn {
@@ -73,12 +74,12 @@ h1, h2, h3, .font-display {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  border-radius: 999px;
-  padding: 0.6rem 1.15rem;
+  border-radius: 10px;
+  padding: 0.55rem 0.95rem;
   font-weight: 700;
   font-size: 0.82rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   border: 1px solid transparent;
   cursor: pointer;
   transition: 0.15s ease;
@@ -453,6 +454,121 @@ table.data th {
   .tv-truck-2,
   .tv-motion-glow {
     animation: none !important;
+  }
+}
+
+/* Login / cadastro / recuperar — modelo app de férias */
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(236, 31, 40, 0.35), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(124, 122, 122, 0.25), transparent 38%),
+    linear-gradient(160deg, #1a1a1a, #2b2b2b 48%, #3a1518);
+}
+
+.login-card {
+  width: min(920px, 100%);
+  background: var(--surface);
+  border-radius: 20px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+}
+
+.login-hero {
+  padding: 2.2rem;
+  background:
+    linear-gradient(160deg, rgba(26, 26, 26, 0.94), rgba(236, 31, 40, 0.88)),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><path fill="%23ffffff10" d="M0 40h80M40 0v80"/></svg>');
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 420px;
+}
+
+.login-hero-logo {
+  width: min(180px, 70%);
+  height: auto;
+  margin-bottom: auto;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+}
+
+.login-hero h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.login-hero p {
+  opacity: 0.85;
+  max-width: 32ch;
+  margin: 0;
+}
+
+.login-form {
+  padding: 1.75rem 1.6rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.login-form-logo {
+  height: 40px;
+  width: auto;
+  margin-bottom: 0.5rem;
+  object-fit: contain;
+  object-position: left;
+}
+
+.login-modes {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.login-alert {
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  margin: 0.4rem 0;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.login-alert.ok {
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
+  background: color-mix(in srgb, var(--ok) 12%, var(--surface));
+  color: var(--ok);
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 10px;
+}
+
+.login-field label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .login-hero {
+    min-height: 220px;
   }
 }
 

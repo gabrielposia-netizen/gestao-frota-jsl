@@ -158,8 +158,8 @@ export default function DashboardPage() {
               <AreaChart data={monthly}>
                 <defs>
                   <linearGradient id="gFuel" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#e30613" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#e30613" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#ec1f28" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#ec1f28" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                 <YAxis stroke="var(--muted)" fontSize={12} />
                 <Tooltip />
                 <Legend />
-                <Area type="monotone" dataKey="fuelCost" name="Combustível R$" stroke="#e30613" fill="url(#gFuel)" />
+                <Area type="monotone" dataKey="fuelCost" name="Combustível R$" stroke="#ec1f28" fill="url(#gFuel)" />
                 <Area type="monotone" dataKey="maintCost" name="Manutenção R$" stroke="#1a1a1a" fill="transparent" />
               </AreaChart>
             </ResponsiveContainer>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                 <XAxis dataKey="month" stroke="var(--muted)" fontSize={12} />
                 <YAxis stroke="var(--muted)" fontSize={12} />
                 <Tooltip />
-                <Bar dataKey="exits" name="Saídas" fill="#e30613" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="exits" name="Saídas" fill="#ec1f28" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

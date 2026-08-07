@@ -2,8 +2,6 @@ import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import AppLayout from './components/AppLayout';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import VehiclesPage from './pages/VehiclesPage';
 import VehicleDetailPage from './pages/VehicleDetailPage';
@@ -39,8 +37,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/cadastro" element={<RegisterPage />} />
-      <Route path="/recuperar-senha" element={<ForgotPasswordPage />} />
+      <Route path="/cadastro" element={<Navigate to="/login" replace />} />
+      <Route path="/recuperar-senha" element={<Navigate to="/login" replace />} />
       <Route element={<PrivateRoute />}>
         <Route path="/tv" element={<TvPanelPage />} />
         <Route element={<Shell />}>

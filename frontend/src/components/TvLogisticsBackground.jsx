@@ -8,13 +8,13 @@ export default function TvLogisticsBackground() {
         <svg className="tv-motion-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
           <defs>
             <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#e30613" stopOpacity="0" />
-              <stop offset="40%" stopColor="#e30613" stopOpacity="0.28" />
+              <stop offset="0%" stopColor="#ec1f28" stopOpacity="0" />
+              <stop offset="40%" stopColor="#ec1f28" stopOpacity="0.28" />
               <stop offset="100%" stopColor="#9a9a9a" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="routeGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#6b6b6b" stopOpacity="0" />
-              <stop offset="50%" stopColor="#e30613" stopOpacity="0.18" />
+              <stop offset="50%" stopColor="#ec1f28" stopOpacity="0.18" />
               <stop offset="100%" stopColor="#6b6b6b" stopOpacity="0" />
             </linearGradient>
           </defs>
@@ -40,7 +40,7 @@ export default function TvLogisticsBackground() {
             className="tv-route tv-route-c"
             d="M120 -40 C 180 200, 120 420, 280 620 S 720 860, 980 980"
             fill="none"
-            stroke="rgba(227,6,19,0.12)"
+            stroke="rgba(236, 31, 40,0.12)"
             strokeWidth="2"
             strokeDasharray="8 14"
           />
@@ -66,7 +66,7 @@ export default function TvLogisticsBackground() {
 
           {/* Silhuetas suaves de veículos em movimento */}
           <g className="tv-truck tv-truck-1" opacity="0.22">
-            <rect x="0" y="0" width="46" height="18" rx="4" fill="#e30613" />
+            <rect x="0" y="0" width="46" height="18" rx="4" fill="#ec1f28" />
             <rect x="34" y="-6" width="18" height="14" rx="3" fill="#c40510" />
             <circle cx="10" cy="20" r="4" fill="#5a5a5a" />
             <circle cx="36" cy="20" r="4" fill="#5a5a5a" />
