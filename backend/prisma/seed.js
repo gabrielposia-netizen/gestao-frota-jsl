@@ -1,12 +1,32 @@
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import { upsertQlpEmployees } from '../scripts/import-qlp.js';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  try {
+    const qlpCount = await upsertQlpEmployees(prisma);
+    console.log(`QLP importado: ${qlpCount} colaboradores.`);
+  } catch (err) {
+    console.warn('Aviso: não foi possível importar QLP:', err.message);
+  }
+
   const existing = await prisma.user.findUnique({ where: { email: 'admin@frota.jsl' } });
   if (existing) {
-    console.log('Seed já aplicado — pulando.');
+    // Garante matrícula nos usuários demo
+    const demos = [
+      { email: 'admin@frota.jsl', matricula: 'ADMIN01' },
+      { email: 'supervisor@frota.jsl', matricula: 'SUPER01' },
+      { email: 'operador@frota.jsl', matricula: 'OPER01' },
+    ];
+    for (const d of demos) {
+      await prisma.user.updateMany({
+        where: { email: d.email },
+        data: { matricula: d.matricula },
+      });
+    }
+    console.log('Seed de usuários demo já aplicado — matrículas sincronizadas.');
     return;
   }
 
@@ -17,13 +37,31 @@ async function main() {
   ]);
 
   const admin = await prisma.user.create({
-    data: { name: 'Administrador JSL', email: 'admin@frota.jsl', passwordHash: adminHash, role: 'ADMIN' },
+    data: {
+      name: 'Administrador JSL',
+      email: 'admin@frota.jsl',
+      matricula: 'ADMIN01',
+      passwordHash: adminHash,
+      role: 'ADMIN',
+    },
   });
   const supervisor = await prisma.user.create({
-    data: { name: 'Carlos Supervisor', email: 'supervisor@frota.jsl', passwordHash: superHash, role: 'SUPERVISOR' },
+    data: {
+      name: 'Carlos Supervisor',
+      email: 'supervisor@frota.jsl',
+      matricula: 'SUPER01',
+      passwordHash: superHash,
+      role: 'SUPERVISOR',
+    },
   });
   const operador = await prisma.user.create({
-    data: { name: 'Ana Operadora', email: 'operador@frota.jsl', passwordHash: operHash, role: 'OPERADOR' },
+    data: {
+      name: 'Ana Operadora',
+      email: 'operador@frota.jsl',
+      matricula: 'OPER01',
+      passwordHash: operHash,
+      role: 'OPERADOR',
+    },
   });
 
   const drivers = await Promise.all([

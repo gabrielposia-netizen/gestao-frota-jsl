@@ -20,4 +20,4 @@ ENV UPLOAD_DIR=/app/uploads
 RUN mkdir -p /app/uploads
 EXPOSE 4000
 # seed só cria dados demo se o banco estiver vazio
-CMD ["sh", "-c", "npx prisma db push && node prisma/seed.js && node src/index.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node prisma/seed.js && node src/index.js"]

@@ -15,7 +15,7 @@ function run(cmd, args) {
   });
 }
 
-await run('npx', ['prisma', 'db', 'push']);
+await run('npx', ['prisma', 'db', 'push', '--accept-data-loss']);
 await run('node', ['prisma/seed.js']);
 console.log('PostgreSQL embutido ativo. Mantenha este terminal aberto.');
 await new Promise(() => {});

@@ -10,7 +10,7 @@ export default function UsersPage() {
   const { can } = useAuth();
   const [items, setItems] = useState([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'OPERADOR' });
+  const [form, setForm] = useState({ name: '', email: '', matricula: '', password: '', role: 'OPERADOR' });
   const allowed = can('ADMIN', 'SUPERVISOR');
 
   useEffect(() => {
@@ -24,6 +24,7 @@ export default function UsersPage() {
     e.preventDefault();
     await api('/users', { method: 'POST', body: JSON.stringify(form) });
     setOpen(false);
+    setForm({ name: '', email: '', matricula: '', password: '', role: 'OPERADOR' });
     const data = await api('/users?pageSize=50');
     setItems(data.items);
   }
@@ -37,10 +38,11 @@ export default function UsersPage() {
       />
       <div className="card table-wrap">
         <table className="data">
-          <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th></tr></thead>
+          <thead><tr><th>Matrícula</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th></tr></thead>
           <tbody>
             {items.map((u) => (
               <tr key={u.id}>
+                <td className="font-semibold">{u.matricula}</td>
                 <td className="font-semibold">{u.name}</td>
                 <td>{u.email}</td>
                 <td>{ROLE_LABEL[u.role]}</td>
@@ -53,6 +55,7 @@ export default function UsersPage() {
       <Modal open={open} onClose={() => setOpen(false)} title="Novo usuário">
         <form className="space-y-3" onSubmit={save}>
           <Field label="Nome"><input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
+          <Field label="Matrícula"><input className="input" required value={form.matricula} onChange={(e) => setForm({ ...form, matricula: e.target.value })} /></Field>
           <Field label="E-mail"><input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></Field>
           <Field label="Senha"><input className="input" type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></Field>
           <Field label="Perfil">

@@ -28,10 +28,14 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       loading,
-      async login(email, password) {
+      applySession(token, nextUser) {
+        setSession(token, nextUser);
+        setUser(nextUser);
+      },
+      async login(matricula, password) {
         const data = await api('/auth/login', {
           method: 'POST',
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ matricula, password }),
         });
         setSession(data.token, data.user);
         setUser(data.user);

@@ -20,7 +20,7 @@ async function run(cmd, args) {
 }
 
 try {
-  await run('npx', ['prisma', 'db', 'push']);
+  await run('npx', ['prisma', 'db', 'push', '--accept-data-loss']);
   await run('node', ['prisma/seed.js']);
   await run('node', ['--watch', 'src/index.js']);
 } catch (err) {
