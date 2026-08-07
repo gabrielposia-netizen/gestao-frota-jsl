@@ -38,7 +38,7 @@ export default function DashboardPage() {
   }
 
   if (!data) return <div className="text-[var(--muted)] animate-pulse">Carregando indicadores...</div>;
-  const { kpis, vencimentos, recentMovements, monthly, shiftsToday } = data;
+  const { kpis, vencimentos, recentMovements, monthly, shiftsToday, consumoPorVeiculo = [] } = data;
 
   const shiftSummary = shiftsToday.reduce((acc, s) => {
     acc[s.shift] = acc[s.shift] || { DISPONIVEL: 0, total: 0 };
@@ -89,7 +89,12 @@ export default function DashboardPage() {
           active={statusFilter === 'EM_USO'}
           onClick={() => toggleFilter('EM_USO')}
         />
-        <KpiCard label="Consumo médio" value={`${kpis.consumoMedioLitros} L`} icon={Fuel} hint="Abastecimentos do mês" />
+        <KpiCard
+          label="Consumo médio frota"
+          value={kpis.consumoMedioKmL != null ? `${kpis.consumoMedioKmL} km/L` : '—'}
+          icon={Fuel}
+          hint="Com base em abastecimentos com odômetro"
+        />
         <KpiCard label="Quilometragem total" value={`${Number(kpis.kmTotal).toLocaleString('pt-BR')} km`} icon={Gauge} />
         <KpiCard label="Tempo parado (manutenção)" value={`${kpis.tempoParadoHoras} h`} icon={Clock3} hint={`Média ${kpis.tempoParadoMedio} h`} />
       </div>
@@ -149,6 +154,65 @@ export default function DashboardPage() {
           )}
         </div>
       )}
+
+      <div className="card card-interactive p-4 mb-5">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
+          <div>
+            <h2 className="font-display font-bold text-lg tracking-tight">Consumo médio por veículo</h2>
+            <p className="text-sm text-[var(--muted)]">km/L calculado entre abastecimentos consecutivos com odômetro</p>
+          </div>
+          <Link to="/abastecimentos" className="text-sm text-[var(--jsl-red)] font-bold">Abastecimentos</Link>
+        </div>
+        {consumoPorVeiculo.length === 0 ? (
+          <div className="text-[var(--muted)] text-sm py-8 text-center">
+            Sem dados suficientes. Registre ao menos 2 abastecimentos com odômetro por veículo.
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-2 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={consumoPorVeiculo.slice(0, 8)} layout="vertical" margin={{ left: 8, right: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis type="number" stroke="var(--muted)" fontSize={12} unit=" km/L" />
+                  <YAxis type="category" dataKey="plate" stroke="var(--muted)" fontSize={12} width={70} />
+                  <Tooltip formatter={(value) => [`${value} km/L`, 'Consumo']} />
+                  <Bar dataKey="kmPorLitro" name="km/L" fill="#ec1f28" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="lg:col-span-3 table-wrap">
+              <table className="data">
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Modelo</th>
+                    <th>Km rodados</th>
+                    <th>Litros</th>
+                    <th>km/L</th>
+                    <th>L/100km</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {consumoPorVeiculo.map((c) => (
+                    <tr key={c.vehicleId} className="row-interactive">
+                      <td className="font-semibold">{c.plate}</td>
+                      <td>{c.model || '—'}</td>
+                      <td>{Number(c.kmRodados).toLocaleString('pt-BR')}</td>
+                      <td>{c.litros}</td>
+                      <td className="font-bold text-[var(--jsl-red)]">{c.kmPorLitro}</td>
+                      <td>{c.litrosPor100km}</td>
+                      <td>
+                        <Link className="btn btn-secondary px-2 py-1" to={`/veiculos/${c.vehicleId}`}>Abrir</Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="grid lg:grid-cols-3 gap-4 mb-5">
         <div className="card card-interactive p-4 lg:col-span-2">

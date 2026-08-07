@@ -20,6 +20,7 @@ router.get('/', async (_req, res) => {
     downtime,
     kmTotal,
     shifts,
+    fuelingsAll,
   ] = await Promise.all([
     prisma.vehicle.groupBy({ by: ['status'], _count: true }),
     prisma.fueling.findMany({
@@ -53,6 +54,17 @@ router.get('/', async (_req, res) => {
     prisma.shiftAvailability.findMany({
       where: { date: new Date(now.toISOString().slice(0, 10)) },
       include: { vehicle: { select: { plate: true, type: true } } },
+    }),
+    prisma.fueling.findMany({
+      where: { odometerKm: { not: null } },
+      orderBy: [{ vehicleId: 'asc' }, { fueledAt: 'asc' }],
+      select: {
+        vehicleId: true,
+        liters: true,
+        odometerKm: true,
+        fueledAt: true,
+        vehicle: { select: { id: true, plate: true, model: true, manufacturer: true, type: true } },
+      },
     }),
   ]);
 
@@ -95,10 +107,56 @@ router.get('/', async (_req, res) => {
     }),
   );
 
+  const byVehicle = new Map();
+  for (const f of fuelingsAll) {
+    if (!byVehicle.has(f.vehicleId)) byVehicle.set(f.vehicleId, []);
+    byVehicle.get(f.vehicleId).push(f);
+  }
+
+  const consumoPorVeiculo = [];
+  let fleetKm = 0;
+  let fleetLiters = 0;
+
+  for (const [, fills] of byVehicle) {
+    let km = 0;
+    let liters = 0;
+    let segments = 0;
+    for (let i = 1; i < fills.length; i++) {
+      const prev = fills[i - 1];
+      const curr = fills[i];
+      const delta = Number(curr.odometerKm) - Number(prev.odometerKm);
+      if (delta <= 0 || !curr.liters || curr.liters <= 0) continue;
+      km += delta;
+      liters += curr.liters;
+      segments += 1;
+    }
+    if (segments === 0 || liters <= 0) continue;
+    const v = fills[0].vehicle;
+    const kmPorLitro = Number((km / liters).toFixed(2));
+    const litrosPor100km = Number(((liters / km) * 100).toFixed(2));
+    fleetKm += km;
+    fleetLiters += liters;
+    consumoPorVeiculo.push({
+      vehicleId: v.id,
+      plate: v.plate,
+      model: `${v.manufacturer || ''} ${v.model || ''}`.trim(),
+      type: v.type,
+      kmRodados: Number(km.toFixed(0)),
+      litros: Number(liters.toFixed(1)),
+      kmPorLitro,
+      litrosPor100km,
+      abastecimentos: segments + 1,
+    });
+  }
+
+  consumoPorVeiculo.sort((a, b) => b.kmPorLitro - a.kmPorLitro);
+
   const avgConsumption =
-    fuelLiters > 0 && fuelingsMonth.length > 1
-      ? Number((fuelLiters / Math.max(fuelingsMonth.length, 1)).toFixed(1))
-      : fuelLiters;
+    fleetLiters > 0
+      ? Number((fleetKm / fleetLiters).toFixed(2))
+      : fuelLiters > 0 && fuelingsMonth.length > 1
+        ? Number((fuelLiters / Math.max(fuelingsMonth.length, 1)).toFixed(1))
+        : 0;
 
   res.json({
     kpis: {
@@ -110,6 +168,7 @@ router.get('/', async (_req, res) => {
       custoCombustivelMes: Number(fuelCost.toFixed(2)),
       custoManutencaoMes: Number(maintCost.toFixed(2)),
       consumoMedioLitros: avgConsumption,
+      consumoMedioKmL: fleetLiters > 0 ? avgConsumption : null,
       kmTotal: kmTotal._sum.odometerKm || 0,
       tempoParadoHoras: downtime._sum.downtimeHours || 0,
       tempoParadoMedio: Number((downtime._avg.downtimeHours || 0).toFixed(1)),
@@ -119,6 +178,7 @@ router.get('/', async (_req, res) => {
     monthly,
     shiftsToday: shifts,
     byStatus: statusMap,
+    consumoPorVeiculo,
   });
 });
 
