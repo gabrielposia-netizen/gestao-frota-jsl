@@ -1,0 +1,8 @@
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s1.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s2.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s3.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s4.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s5.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s6.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s7.mp4'
+file 'c:\Projetos Pos\Gest?o de Frotas JSL\docs\video\s8.mp4'

@@ -8,10 +8,10 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { api } from '../lib/api';
 import { ROLE_LABEL } from '../lib/labels';
-import JslLogo from './JslLogo';
+import { homeForRole } from '../lib/access';
 
 const links = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'SUPERVISOR'] },
   { to: '/veiculos', label: 'Veículos', icon: Truck },
   { to: '/motoristas', label: 'Motoristas', icon: Users },
   { to: '/movimentacoes', label: 'Entrada/Saída', icon: ClipboardCheck },
@@ -20,11 +20,11 @@ const links = [
   { to: '/manutencoes', label: 'Manutenções', icon: Wrench },
   { to: '/pneus', label: 'Pneus', icon: Droplets },
   { to: '/avarias', label: 'Avarias', icon: AlertTriangle },
-  { to: '/mapa', label: 'Mapa', icon: Map },
-  { to: '/turnos', label: 'Turnos', icon: CalendarClock },
-  { to: '/relatorios', label: 'Relatórios', icon: FileBarChart },
+  { to: '/mapa', label: 'Mapa', icon: Map, roles: ['ADMIN', 'SUPERVISOR'] },
+  { to: '/turnos', label: 'Turnos', icon: CalendarClock, roles: ['ADMIN', 'SUPERVISOR'] },
+  { to: '/relatorios', label: 'Relatórios', icon: FileBarChart, roles: ['ADMIN', 'SUPERVISOR'] },
   { to: '/usuarios', label: 'Usuários', icon: Shield, roles: ['ADMIN'] },
-  { to: '/tv', label: 'Painel TV', icon: Tv },
+  { to: '/tv', label: 'Painel TV', icon: Tv, roles: ['ADMIN', 'SUPERVISOR'] },
 ];
 
 export default function AppLayout({ children }) {
@@ -77,14 +77,15 @@ export default function AppLayout({ children }) {
       <aside className={`sidebar ${open ? 'open' : ''}`}>
         <div className="brand">
           <div className="flex items-start justify-between gap-2">
-            <JslLogo compact className="brand-logo !h-10 brightness-110" />
+            <div>
+              <div className="brand-mark">Sistema interno</div>
+              <h1>Gestão de Frota</h1>
+              <p>Operação de veículos e checklists</p>
+            </div>
             <button className="btn btn-ghost p-2 lg:hidden" type="button" onClick={() => setOpen(false)} aria-label="Fechar menu">
               <X size={16} />
             </button>
           </div>
-          <div className="brand-mark">JSL · Entender para Atender</div>
-          <h1>Gestão de Frota</h1>
-          <p>Controle operacional de veículos e indicadores</p>
         </div>
 
         <nav className="sidebar-nav">
@@ -196,7 +197,10 @@ export default function AppLayout({ children }) {
                       className={`w-full text-left px-2 py-2 rounded-lg hover:bg-[var(--surface-2)] ${n.read ? 'opacity-60' : ''}`}
                       onClick={() => {
                         api(`/notifications/${n.id}/read`, { method: 'PATCH' });
-                        if (n.link) navigate(n.link);
+                        if (n.link) {
+                          const target = n.link === '/' ? homeForRole(user.role) : n.link;
+                          navigate(target);
+                        }
                         setShowNotifs(false);
                       }}
                     >

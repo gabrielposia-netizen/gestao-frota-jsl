@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { TYPE_LABEL } from '../lib/labels';
 import { StatusBadge } from '../components/ui';
-import JslLogo from '../components/JslLogo';
 import TvLogisticsBackground from '../components/TvLogisticsBackground';
 
 export default function TvPanelPage() {
@@ -45,9 +44,9 @@ export default function TvPanelPage() {
 
       <div className="relative z-10">
         <div className="jsl-header px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <JslLogo compact />
-            <div className="hidden sm:block text-[10px] uppercase tracking-[0.16em] text-white/80 border-l border-white/25 pl-3">
+          <div className="min-w-0">
+            <div className="font-display font-bold text-white text-lg">Gestão de Frota</div>
+            <div className="text-[10px] uppercase tracking-[0.16em] text-white/80">
               Painel TV · Tempo real
             </div>
           </div>

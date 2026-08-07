@@ -7,8 +7,8 @@
 | Frontend | **Vercel** | https://gestao-frota-jsl.vercel.app |
 | API + Postgres | Railway | https://web-production-5d52d3.up.railway.app |
 
-### Login demo
-- admin@frota.jsl / admin123  
+### Login admin bootstrap
+- Matrícula `ADMIN` / senha `Admin@Frota1` (trocar após o primeiro acesso)
 
 O Vercel serve o frontend e encaminha `/api` e `/uploads` para a Railway (`frontend/vercel.json`).
 

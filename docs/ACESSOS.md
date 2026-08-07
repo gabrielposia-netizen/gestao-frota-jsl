@@ -1,24 +1,20 @@
-# Acesso — Gestão de Frota JSL
+# Acesso — Gestão de Frota
 
-## Online (Vercel)
+## Online
 
-**Link único (PC e celular):**  
-https://gestao-frota-jsl.vercel.app
+**https://gestao-frota-jsl.vercel.app**
 
-- Página de acesso: https://gestao-frota-jsl.vercel.app/acesso.html  
-- Login: https://gestao-frota-jsl.vercel.app/login  
+### Admin bootstrap (primeiro acesso)
+- Matrícula: `ADMIN`
+- E-mail: `admin@frota.local`
+- Senha: `Admin@Frota1`  
 
-### Login demo
-- E-mail: `admin@frota.jsl`
-- Senha: `admin123`
+Troque a senha após entrar. Demais usuários devem se cadastrar com matrícula do QLP.
 
-> Frontend no Vercel; API + banco na Railway. Fica operante sem depender do seu PC.
+### Perfis
+- **Motorista / Operador de empilhadeira:** rotinas operacionais (entrada/saída, checklist, etc.). **Sem dashboard.**
+- **Coordenador / Supervisor / Líder de manutenção:** painel gerencial + operação.
+- **Admin:** acesso total, inclusive usuários.
 
-## API (Railway)
-
-https://web-production-5d52d3.up.railway.app  
-
-Painel Railway: https://railway.com/project/67c44ff9-1be6-4dc9-af1b-5ec32937707c  
-Painel Vercel: https://vercel.com/gabrielposia-3136s-projects/gestao-frota-jsl  
-
-Guia: [`docs/DEPLOY.md`](DEPLOY.md)
+### Cadastro
+Na tela de login → **Cadastrar** → matrícula do QLP + e-mail + senha.

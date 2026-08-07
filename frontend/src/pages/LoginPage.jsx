@@ -3,21 +3,21 @@ import { Navigate } from 'react-router-dom';
 import { KeyRound, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
-import JslLogo from '../components/JslLogo';
+import { homeForRole } from '../lib/access';
 
 export default function LoginPage() {
   const { login, applySession, user, loading } = useAuth();
   const [mode, setMode] = useState('login');
-  const [identificador, setIdentificador] = useState('ADMIN01');
+  const [identificador, setIdentificador] = useState('');
   const [matricula, setMatricula] = useState('');
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('admin123');
+  const [senha, setSenha] = useState('');
   const [confirma, setConfirma] = useState('');
   const [erro, setErro] = useState('');
   const [ok, setOk] = useState('');
   const [busy, setBusy] = useState(false);
 
-  if (!loading && user) return <Navigate to="/" replace />;
+  if (!loading && user) return <Navigate to={homeForRole(user.role)} replace />;
 
   function switchMode(next) {
     setMode(next);
@@ -25,7 +25,6 @@ export default function LoginPage() {
     setOk('');
     setSenha('');
     setConfirma('');
-    if (next === 'login') setSenha('');
   }
 
   async function onLogin(e) {
@@ -95,19 +94,16 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-hero">
-          <div className="login-hero-logo">
-            <JslLogo compact className="!h-12 drop-shadow-md" />
-          </div>
-          <div className="text-xs font-bold uppercase tracking-wide opacity-90">Sistema interno · JSL</div>
+          <div className="text-xs font-bold uppercase tracking-wide opacity-90">Sistema interno</div>
           <h1>Gestão de frota operacional</h1>
           <p>
-            Cadastre-se com sua matrícula do quadro de ativos para controlar veículos, checklists,
-            manutenção e indicadores.
+            Cadastre-se com sua matrícula do quadro de ativos. Motoristas e operadores de empilhadeira
+            acessam as rotinas operacionais; gestores usam o painel gerencial.
           </p>
         </div>
 
         <div className="login-form">
-          <JslLogo className="login-form-logo !h-10" />
+          <div className="font-display text-lg font-bold mb-1">Gestão de Frota</div>
           <div className="login-modes">
             <button type="button" className={`btn ${mode === 'login' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => switchMode('login')}>
               <LogIn size={16} /> Entrar
@@ -140,9 +136,6 @@ export default function LoginPage() {
               <button type="button" className="btn btn-secondary w-full mt-2" onClick={() => switchMode('recuperar')}>
                 Esqueci minha senha
               </button>
-              <p className="text-xs text-[var(--muted)] mt-3 leading-relaxed">
-                Demo: <strong>ADMIN01</strong> / admin123 · SUPER01 / super123 · OPER01 / oper123
-              </p>
             </form>
           )}
 

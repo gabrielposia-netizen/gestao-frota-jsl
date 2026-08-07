@@ -6,7 +6,7 @@ Sistema interno de gestão de frota para operação logística — controle de v
 
 | Canal | URL |
 |-------|-----|
-| **Online (Vercel)** | https://gestao-frota-jsl.vercel.app |
+| **Online** | https://gestao-frota-jsl.vercel.app |
 | Página de acesso | https://gestao-frota-jsl.vercel.app/acesso.html |
 | Login | https://gestao-frota-jsl.vercel.app/login |
 
@@ -50,13 +50,13 @@ npm install
 npm run dev
 ```
 
-## Usuários de demonstração
+## Usuários
 
-| E-mail | Senha | Perfil |
-|--------|-------|--------|
-| admin@frota.jsl | admin123 | Administrador |
-| supervisor@frota.jsl | super123 | Supervisor |
-| operador@frota.jsl | oper123 | Operador |
+| Perfil | Como obter acesso |
+|--------|-------------------|
+| Administrador | Bootstrap inicial (`ADMIN` / `Admin@Frota1`) — trocar senha |
+| Supervisor | Cadastro com matrícula de coordenador, supervisor ou líder de manutenção |
+| Operador | Cadastro com matrícula de motorista ou operador de empilhadeira (sem dashboard) |
 
 ## Módulos
 

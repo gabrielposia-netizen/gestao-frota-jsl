@@ -17,12 +17,30 @@ import ShiftsPage from './pages/ShiftsPage';
 import ReportsPage from './pages/ReportsPage';
 import UsersPage from './pages/UsersPage';
 import TvPanelPage from './pages/TvPanelPage';
+import { canAccessPath, homeForRole } from './lib/access';
 
 function PrivateRoute() {
   const { user, loading } = useAuth();
   if (loading) return <div className="min-h-screen grid place-items-center text-[var(--muted)]">Carregando...</div>;
   if (!user) return <Navigate to="/login" replace />;
   return <Outlet />;
+}
+
+function RoleRoute({ roles }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to={homeForRole(user.role)} replace />;
+  }
+  return <Outlet />;
+}
+
+function HomeRedirect() {
+  const { user } = useAuth();
+  if (!canAccessPath(user.role, '/')) {
+    return <Navigate to={homeForRole(user.role)} replace />;
+  }
+  return <DashboardPage />;
 }
 
 function Shell() {
@@ -40,9 +58,11 @@ export default function App() {
       <Route path="/cadastro" element={<Navigate to="/login" replace />} />
       <Route path="/recuperar-senha" element={<Navigate to="/login" replace />} />
       <Route element={<PrivateRoute />}>
-        <Route path="/tv" element={<TvPanelPage />} />
+        <Route element={<RoleRoute roles={['ADMIN', 'SUPERVISOR']} />}>
+          <Route path="/tv" element={<TvPanelPage />} />
+        </Route>
         <Route element={<Shell />}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/" element={<HomeRedirect />} />
           <Route path="/veiculos" element={<VehiclesPage />} />
           <Route path="/veiculos/:id" element={<VehicleDetailPage />} />
           <Route path="/motoristas" element={<DriversPage />} />
@@ -52,10 +72,14 @@ export default function App() {
           <Route path="/manutencoes" element={<MaintenancesPage />} />
           <Route path="/pneus" element={<TiresPage />} />
           <Route path="/avarias" element={<DamagesPage />} />
-          <Route path="/mapa" element={<MapPage />} />
-          <Route path="/turnos" element={<ShiftsPage />} />
-          <Route path="/relatorios" element={<ReportsPage />} />
-          <Route path="/usuarios" element={<UsersPage />} />
+          <Route element={<RoleRoute roles={['ADMIN', 'SUPERVISOR']} />}>
+            <Route path="/mapa" element={<MapPage />} />
+            <Route path="/turnos" element={<ShiftsPage />} />
+            <Route path="/relatorios" element={<ReportsPage />} />
+          </Route>
+          <Route element={<RoleRoute roles={['ADMIN']} />}>
+            <Route path="/usuarios" element={<UsersPage />} />
+          </Route>
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
