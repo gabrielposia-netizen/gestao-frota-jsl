@@ -61,7 +61,7 @@ export function Modal({ open, onClose, title, children, wide }) {
     <div className="modal-overlay" role="dialog" aria-modal="true">
       <button type="button" className="modal-backdrop" aria-label="Fechar" onClick={onClose} />
       <div className={`modal-panel card ${wide ? 'modal-wide' : ''}`}>
-        <div className="flex items-center justify-between mb-4 gap-3 sticky top-0 z-[1] bg-[var(--card)] pt-1 pb-2">
+        <div className="flex items-center justify-between mb-4 gap-3 sticky top-0 z-[1] bg-[var(--surface)] pt-1 pb-2">
           <h2 className="font-display text-xl font-bold uppercase tracking-tight">{title}</h2>
           <button type="button" className="btn btn-secondary px-3 shrink-0" onClick={onClose}>Fechar</button>
         </div>
