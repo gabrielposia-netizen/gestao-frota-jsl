@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { STATUS_COLOR, STATUS_LABEL } from '../lib/labels';
 
 export function StatusBadge({ status }) {
@@ -56,18 +58,34 @@ export function EmptyState({ message }) {
 }
 
 export function Modal({ open, onClose, title, children, wide }) {
-  if (!open) return null;
-  return (
-    <div className="modal-overlay" role="dialog" aria-modal="true">
+  useEffect(() => {
+    if (!open) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open, onClose]);
+
+  if (!open || typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={title}>
       <button type="button" className="modal-backdrop" aria-label="Fechar" onClick={onClose} />
       <div className={`modal-panel card ${wide ? 'modal-wide' : ''}`}>
-        <div className="flex items-center justify-between mb-4 gap-3 sticky top-0 z-[1] bg-[var(--surface)] pt-1 pb-2">
+        <div className="modal-panel-head">
           <h2 className="font-display text-xl font-bold uppercase tracking-tight">{title}</h2>
           <button type="button" className="btn btn-secondary px-3 shrink-0" onClick={onClose}>Fechar</button>
         </div>
-        {children}
+        <div className="modal-panel-body">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
