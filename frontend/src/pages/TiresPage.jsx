@@ -9,6 +9,7 @@ export default function TiresPage() {
   const [tab, setTab] = useState('estoque');
   const [tires, setTires] = useState([]);
   const [stock, setStock] = useState({ items: [], lowStock: [] });
+  const [stockError, setStockError] = useState('');
   const [vehicles, setVehicles] = useState([]);
   const [openTire, setOpenTire] = useState(false);
   const [openStock, setOpenStock] = useState(false);
@@ -18,20 +19,27 @@ export default function TiresPage() {
   const [moveForm, setMoveForm] = useState({ type: 'ENTRADA', quantity: 1, vehicleId: '', notes: '' });
 
   async function load() {
-    const [t, s, v] = await Promise.all([
-      api('/tires'),
-      api('/stock'),
-      api('/vehicles?pageSize=100'),
+    const [t, v] = await Promise.all([
+      api('/tires').catch(() => []),
+      api('/vehicles?pageSize=100').catch(() => ({ items: [] })),
     ]);
-    setTires(t);
-    setStock(s);
-    setVehicles(v.items);
+    setTires(Array.isArray(t) ? t : []);
+    setVehicles(v.items || []);
+
+    try {
+      const s = await api('/stock');
+      setStock({ items: s.items || [], lowStock: s.lowStock || [] });
+      setStockError('');
+    } catch (err) {
+      setStock({ items: [], lowStock: [] });
+      setStockError(err.message || 'Estoque indisponível no momento');
+    }
   }
 
   useEffect(() => { load().catch(console.error); }, []);
 
-  const pneusEstoque = useMemo(() => stock.items.filter((i) => i.type === 'PNEU'), [stock.items]);
-  const bateriasEstoque = useMemo(() => stock.items.filter((i) => i.type === 'BATERIA'), [stock.items]);
+  const pneusEstoque = useMemo(() => (stock.items || []).filter((i) => i.type === 'PNEU'), [stock.items]);
+  const bateriasEstoque = useMemo(() => (stock.items || []).filter((i) => i.type === 'BATERIA'), [stock.items]);
 
   async function saveTire(e) {
     e.preventDefault();
@@ -67,7 +75,7 @@ export default function TiresPage() {
     <div className="animate-fade-up">
       <PageHeader
         title="Pneus e baterias"
-        subtitle="Estoque inteligente + itens instalados nos veículos"
+        subtitle="Estoque de pneus e baterias + itens instalados nos veículos"
         actions={(
           <div className="flex flex-wrap gap-2">
             {can('ADMIN', 'SUPERVISOR') && (
@@ -77,6 +85,12 @@ export default function TiresPage() {
           </div>
         )}
       />
+
+      {stockError && (
+        <div className="mb-4 rounded-xl px-3 py-2 bg-red-500/15 text-red-800 dark:text-red-200 text-sm font-semibold">
+          Não foi possível carregar o estoque: {stockError}
+        </div>
+      )}
 
       {stock.lowStock?.length > 0 && (
         <div className="mb-4 rounded-xl px-3 py-2 bg-amber-500/15 text-amber-800 dark:text-amber-200 text-sm font-semibold flex items-center gap-2">
@@ -117,7 +131,11 @@ export default function TiresPage() {
                 </thead>
                 <tbody>
                   {block.items.length === 0 && (
-                    <tr><td colSpan={6} className="text-[var(--muted)] text-sm">Nenhum item cadastrado.</td></tr>
+                    <tr>
+                      <td colSpan={6} className="text-[var(--muted)] text-sm">
+                        Nenhum item cadastrado. Use &quot;Novo item estoque&quot; para adicionar.
+                      </td>
+                    </tr>
                   )}
                   {block.items.map((i) => (
                     <tr key={i.id} className={i.quantity <= i.minQuantity ? 'bg-amber-500/10' : ''}>
@@ -145,6 +163,9 @@ export default function TiresPage() {
           <table className="data">
             <thead><tr><th>Veículo</th><th>Posição</th><th>Marca</th><th>Sulco (mm)</th><th>PSI</th><th>Status</th></tr></thead>
             <tbody>
+              {tires.length === 0 && (
+                <tr><td colSpan={6} className="text-[var(--muted)] text-sm">Nenhum pneu instalado registrado.</td></tr>
+              )}
               {tires.map((t) => (
                 <tr key={t.id}>
                   <td className="font-semibold">{t.vehicle.plate}</td>

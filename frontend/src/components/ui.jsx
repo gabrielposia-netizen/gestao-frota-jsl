@@ -58,12 +58,12 @@ export function EmptyState({ message }) {
 export function Modal({ open, onClose, title, children, wide }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
-      <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px]" onClick={onClose} />
-      <div className={`relative card w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-[90vh] overflow-auto p-5 shadow-2xl animate-scale-in`}>
-        <div className="flex items-center justify-between mb-4">
+    <div className="modal-overlay" role="dialog" aria-modal="true">
+      <button type="button" className="modal-backdrop" aria-label="Fechar" onClick={onClose} />
+      <div className={`modal-panel card ${wide ? 'modal-wide' : ''}`}>
+        <div className="flex items-center justify-between mb-4 gap-3 sticky top-0 z-[1] bg-[var(--card)] pt-1 pb-2">
           <h2 className="font-display text-xl font-bold uppercase tracking-tight">{title}</h2>
-          <button className="btn btn-secondary px-3" onClick={onClose}>Fechar</button>
+          <button type="button" className="btn btn-secondary px-3 shrink-0" onClick={onClose}>Fechar</button>
         </div>
         {children}
       </div>
