@@ -4,6 +4,7 @@ import prisma from '../lib/prisma.js';
 import { authRequired, requireRoles } from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
 import { parsePagination } from '../utils/query.js';
+import { suggestUsageMetric } from '../lib/usage.js';
 
 const router = Router();
 router.use(authRequired);
@@ -120,6 +121,9 @@ router.get('/:id/qrcode', async (req, res) => {
 router.post('/', requireRoles('ADMIN', 'SUPERVISOR'), async (req, res) => {
   try {
     const data = req.body;
+    const type = data.type || 'CAMINHAO';
+    const fuelType = data.fuelType;
+    const usageMetric = data.usageMetric || suggestUsageMetric(type, fuelType);
     const vehicle = await prisma.vehicle.create({
       data: {
         plate: data.plate.toUpperCase().replace(/\s/g, ''),
@@ -129,10 +133,11 @@ router.post('/', requireRoles('ADMIN', 'SUPERVISOR'), async (req, res) => {
         renavam: data.renavam,
         chassis: data.chassis,
         sector: data.sector,
-        type: data.type || 'CAMINHAO',
+        type,
         status: data.status || 'DISPONIVEL',
+        usageMetric,
         odometerKm: Number(data.odometerKm) || 0,
-        fuelType: data.fuelType,
+        fuelType,
         capacityLiters: data.capacityLiters ? Number(data.capacityLiters) : null,
         photoUrl: data.photoUrl,
         currentLat: data.currentLat ? Number(data.currentLat) : null,
@@ -160,6 +165,10 @@ router.patch('/:id', requireRoles('ADMIN', 'SUPERVISOR'), async (req, res) => {
     if (data.odometerKm != null) data.odometerKm = Number(data.odometerKm);
     if (data.currentLat != null) data.currentLat = Number(data.currentLat);
     if (data.currentLng != null) data.currentLng = Number(data.currentLng);
+    if (!data.usageMetric && (data.type || data.fuelType)) {
+      const current = await prisma.vehicle.findUnique({ where: { id: req.params.id } });
+      data.usageMetric = suggestUsageMetric(data.type || current?.type, data.fuelType || current?.fuelType);
+    }
     const vehicle = await prisma.vehicle.update({ where: { id: req.params.id }, data });
     res.json(vehicle);
   } catch (err) {

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma.js';
 import { authRequired } from '../middleware/auth.js';
+import { suggestUsageMetric } from '../lib/usage.js';
 
 const router = Router();
 router.use(authRequired);
@@ -21,6 +22,7 @@ router.get('/', async (_req, res) => {
     kmTotal,
     shifts,
     fuelingsAll,
+    stockLow,
   ] = await Promise.all([
     prisma.vehicle.groupBy({ by: ['status'], _count: true }),
     prisma.fueling.findMany({
@@ -63,8 +65,12 @@ router.get('/', async (_req, res) => {
         liters: true,
         odometerKm: true,
         fueledAt: true,
-        vehicle: { select: { id: true, plate: true, model: true, manufacturer: true, type: true } },
+        vehicle: { select: { id: true, plate: true, model: true, manufacturer: true, type: true, fuelType: true, usageMetric: true } },
       },
+    }),
+    prisma.stockItem.findMany({
+      where: { active: true },
+      select: { id: true, type: true, brand: true, model: true, quantity: true, minQuantity: true },
     }),
   ]);
 
@@ -132,8 +138,9 @@ router.get('/', async (_req, res) => {
     }
     if (segments === 0 || liters <= 0) continue;
     const v = fills[0].vehicle;
-    const kmPorLitro = Number((km / liters).toFixed(2));
-    const litrosPor100km = Number(((liters / km) * 100).toFixed(2));
+    const metric = v.usageMetric || suggestUsageMetric(v.type, v.fuelType);
+    const rate = Number((km / liters).toFixed(2));
+    const inverse = Number(((liters / km) * 100).toFixed(2));
     fleetKm += km;
     fleetLiters += liters;
     consumoPorVeiculo.push({
@@ -141,15 +148,20 @@ router.get('/', async (_req, res) => {
       plate: v.plate,
       model: `${v.manufacturer || ''} ${v.model || ''}`.trim(),
       type: v.type,
-      kmRodados: Number(km.toFixed(0)),
+      usageMetric: metric,
+      kmRodados: Number(km.toFixed(metric === 'HOURS' ? 1 : 0)),
       litros: Number(liters.toFixed(1)),
-      kmPorLitro,
-      litrosPor100km,
+      kmPorLitro: metric === 'HOURS' ? null : rate,
+      horasPorLitro: metric === 'HOURS' ? rate : null,
+      litrosPor100km: metric === 'HOURS' ? null : inverse,
+      litrosPorHora: metric === 'HOURS' ? Number((liters / km).toFixed(2)) : null,
+      rateLabel: metric === 'HOURS' ? `${rate} h/L` : `${rate} km/L`,
+      rateValue: rate,
       abastecimentos: segments + 1,
     });
   }
 
-  consumoPorVeiculo.sort((a, b) => b.kmPorLitro - a.kmPorLitro);
+  consumoPorVeiculo.sort((a, b) => b.rateValue - a.rateValue);
 
   const avgConsumption =
     fleetLiters > 0
@@ -179,6 +191,7 @@ router.get('/', async (_req, res) => {
     shiftsToday: shifts,
     byStatus: statusMap,
     consumoPorVeiculo,
+    estoqueBaixo: stockLow.filter((s) => s.quantity <= s.minQuantity),
   });
 });
 

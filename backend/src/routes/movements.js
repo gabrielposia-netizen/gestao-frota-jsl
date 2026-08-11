@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
       take,
       orderBy: { occurredAt: 'desc' },
       include: {
-        vehicle: { select: { id: true, plate: true, model: true, status: true } },
+        vehicle: { select: { id: true, plate: true, model: true, status: true, type: true, fuelType: true, usageMetric: true } },
         driver: { select: { id: true, name: true } },
         user: { select: { name: true } },
       },

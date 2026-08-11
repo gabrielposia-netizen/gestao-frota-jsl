@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { TYPE_LABEL, daysUntil, fmtDate, fmtDateTime, money } from '../lib/labels';
 import { PageHeader, StatusBadge } from '../components/ui';
+import { formatUsage, suggestUsageMetric, usageLabel } from '../lib/usage';
 
 export default function VehicleDetailPage() {
   const { id } = useParams();
@@ -25,6 +26,8 @@ export default function VehicleDetailPage() {
 
   if (!vehicle) return <div className="text-[var(--muted)]">Carregando veículo...</div>;
 
+  const metric = vehicle.usageMetric || suggestUsageMetric(vehicle.type, vehicle.fuelType);
+
   const tabs = [
     ['resumo', 'Resumo'],
     ['historico', 'Histórico de uso'],
@@ -43,7 +46,7 @@ export default function VehicleDetailPage() {
 
       <div className="grid md:grid-cols-4 gap-3 mb-4">
         <div className="card p-4"><div className="text-sm text-[var(--muted)]">Status</div><div className="mt-1"><StatusBadge status={vehicle.status} /></div></div>
-        <div className="card p-4"><div className="text-sm text-[var(--muted)]">Odômetro</div><div className="font-bold text-xl mt-1">{Number(vehicle.odometerKm).toLocaleString('pt-BR')} km</div></div>
+        <div className="card p-4"><div className="text-sm text-[var(--muted)]">{usageLabel(metric)}</div><div className="font-bold text-xl mt-1">{formatUsage(vehicle.odometerKm, metric)}</div></div>
         <div className="card p-4"><div className="text-sm text-[var(--muted)]">Setor</div><div className="font-bold text-xl mt-1">{vehicle.sector || '—'}</div></div>
         <div className="card p-4"><div className="text-sm text-[var(--muted)]">Local</div><div className="font-bold text-lg mt-1">{vehicle.locationLabel || '—'}</div></div>
       </div>
@@ -81,7 +84,7 @@ export default function VehicleDetailPage() {
       {tab === 'historico' && history && (
         <div className="card table-wrap">
           <table className="data">
-            <thead><tr><th>Data</th><th>Tipo</th><th>Motorista</th><th>Usuário</th><th>Finalidade</th><th>Km</th></tr></thead>
+            <thead><tr><th>Data</th><th>Tipo</th><th>Motorista</th><th>Usuário</th><th>Finalidade</th><th>Uso</th></tr></thead>
             <tbody>
               {history.movements.map((m) => (
                 <tr key={m.id}>
@@ -90,7 +93,7 @@ export default function VehicleDetailPage() {
                   <td>{m.driver?.name || '—'}</td>
                   <td>{m.user?.name}</td>
                   <td>{m.purpose || '—'}</td>
-                  <td>{m.odometerKm ?? '—'}</td>
+                  <td>{m.odometerKm != null ? formatUsage(m.odometerKm, metric) : '—'}</td>
                 </tr>
               ))}
             </tbody>

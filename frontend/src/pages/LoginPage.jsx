@@ -143,7 +143,7 @@ export default function LoginPage() {
             <form onSubmit={onCadastro}>
               <h2 className="font-display text-xl font-bold mt-2 mb-1">Criar conta</h2>
               <p className="text-[var(--muted)] text-sm mt-0 mb-3">
-                Informe a matrícula do ativo. Nome e perfil vêm do QLP (motorista, empilhadeira, líder de manutenção, coordenador ou supervisor).
+                Informe a matrícula do ativo. Liberado para motoristas, empilhadeiras, líder de manutenção/logística/movimentação, coordenadores, supervisores e Kerolayne.
               </p>
               <div className="login-field">
                 <label>Matrícula</label>

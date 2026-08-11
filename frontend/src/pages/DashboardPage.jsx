@@ -38,7 +38,7 @@ export default function DashboardPage() {
   }
 
   if (!data) return <div className="text-[var(--muted)] animate-pulse">Carregando indicadores...</div>;
-  const { kpis, vencimentos, recentMovements, monthly, shiftsToday, consumoPorVeiculo = [] } = data;
+  const { kpis, vencimentos, recentMovements, monthly, shiftsToday, consumoPorVeiculo = [], estoqueBaixo = [] } = data;
 
   const shiftSummary = shiftsToday.reduce((acc, s) => {
     acc[s.shift] = acc[s.shift] || { DISPONIVEL: 0, total: 0 };
@@ -91,13 +91,23 @@ export default function DashboardPage() {
         />
         <KpiCard
           label="Consumo médio frota"
-          value={kpis.consumoMedioKmL != null ? `${kpis.consumoMedioKmL} km/L` : '—'}
+          value={kpis.consumoMedioKmL != null ? `${kpis.consumoMedioKmL}` : '—'}
           icon={Fuel}
-          hint="Com base em abastecimentos com odômetro"
+          hint="km/L ou h/L conforme o veículo"
         />
-        <KpiCard label="Quilometragem total" value={`${Number(kpis.kmTotal).toLocaleString('pt-BR')} km`} icon={Gauge} />
+        <KpiCard label="Uso acumulado" value={`${Number(kpis.kmTotal).toLocaleString('pt-BR')}`} icon={Gauge} hint="km ou horas no cadastro" />
         <KpiCard label="Tempo parado (manutenção)" value={`${kpis.tempoParadoHoras} h`} icon={Clock3} hint={`Média ${kpis.tempoParadoMedio} h`} />
       </div>
+
+      {estoqueBaixo.length > 0 && (
+        <div className="mb-5 rounded-xl px-4 py-3 bg-amber-500/15 text-amber-900 dark:text-amber-100 text-sm flex flex-wrap items-center justify-between gap-3">
+          <span className="font-semibold flex items-center gap-2">
+            <AlertTriangle size={16} />
+            Estoque baixo: {estoqueBaixo.map((s) => `${s.brand || s.type} (${s.quantity}/${s.minQuantity})`).join(' · ')}
+          </span>
+          <Link to="/pneus" className="btn btn-secondary px-3 py-1">Ver pneus e baterias</Link>
+        </div>
+      )}
 
       {statusFilter && (
         <div className="card p-4 mb-5 border-[var(--jsl-red)]/30 animate-scale-in">
@@ -159,13 +169,13 @@ export default function DashboardPage() {
         <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
           <div>
             <h2 className="font-display font-bold text-lg tracking-tight">Consumo médio por veículo</h2>
-            <p className="text-sm text-[var(--muted)]">km/L calculado entre abastecimentos consecutivos com odômetro</p>
+            <p className="text-sm text-[var(--muted)]">km/L para caminhões/utilitários · h/L para empilhadeiras, elétricos e rebocadores</p>
           </div>
           <Link to="/abastecimentos" className="text-sm text-[var(--jsl-red)] font-bold">Abastecimentos</Link>
         </div>
         {consumoPorVeiculo.length === 0 ? (
           <div className="text-[var(--muted)] text-sm py-8 text-center">
-            Sem dados suficientes. Registre ao menos 2 abastecimentos com odômetro por veículo.
+            Sem dados suficientes. Registre ao menos 2 abastecimentos com odômetro/horas por veículo.
           </div>
         ) : (
           <div className="grid lg:grid-cols-5 gap-4">
@@ -173,10 +183,10 @@ export default function DashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={consumoPorVeiculo.slice(0, 8)} layout="vertical" margin={{ left: 8, right: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis type="number" stroke="var(--muted)" fontSize={12} unit=" km/L" />
+                  <XAxis type="number" stroke="var(--muted)" fontSize={12} />
                   <YAxis type="category" dataKey="plate" stroke="var(--muted)" fontSize={12} width={70} />
-                  <Tooltip formatter={(value) => [`${value} km/L`, 'Consumo']} />
-                  <Bar dataKey="kmPorLitro" name="km/L" fill="#ec1f28" radius={[0, 6, 6, 0]} />
+                  <Tooltip formatter={(value, _n, props) => [props?.payload?.rateLabel || value, 'Consumo']} />
+                  <Bar dataKey="rateValue" name="Consumo" fill="#ec1f28" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -186,10 +196,9 @@ export default function DashboardPage() {
                   <tr>
                     <th>Placa</th>
                     <th>Modelo</th>
-                    <th>Km rodados</th>
+                    <th>Uso</th>
                     <th>Litros</th>
-                    <th>km/L</th>
-                    <th>L/100km</th>
+                    <th>Consumo</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -198,10 +207,9 @@ export default function DashboardPage() {
                     <tr key={c.vehicleId} className="row-interactive">
                       <td className="font-semibold">{c.plate}</td>
                       <td>{c.model || '—'}</td>
-                      <td>{Number(c.kmRodados).toLocaleString('pt-BR')}</td>
+                      <td>{Number(c.kmRodados).toLocaleString('pt-BR')}{c.usageMetric === 'HOURS' ? ' h' : ' km'}</td>
                       <td>{c.litros}</td>
-                      <td className="font-bold text-[var(--jsl-red)]">{c.kmPorLitro}</td>
-                      <td>{c.litrosPor100km}</td>
+                      <td className="font-bold text-[var(--jsl-red)]">{c.rateLabel || c.kmPorLitro}</td>
                       <td>
                         <Link className="btn btn-secondary px-2 py-1" to={`/veiculos/${c.vehicleId}`}>Abrir</Link>
                       </td>

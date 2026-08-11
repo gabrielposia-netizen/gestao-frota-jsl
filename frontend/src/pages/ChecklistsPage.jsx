@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { api } from '../lib/api';
 import { fmtDateTime } from '../lib/labels';
+import { suggestUsageMetric, usageLabel } from '../lib/usage';
 import { Field, Modal, PageHeader } from '../components/ui';
 
 export default function ChecklistsPage() {
@@ -12,6 +13,12 @@ export default function ChecklistsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ vehicleId: '', driverId: '', type: 'PRE_USO', shift: '', notes: '', odometerKm: '' });
   const [checks, setChecks] = useState([]);
+
+  const selectedVehicle = useMemo(
+    () => vehicles.find((v) => v.id === form.vehicleId),
+    [vehicles, form.vehicleId],
+  );
+  const metric = selectedVehicle?.usageMetric || suggestUsageMetric(selectedVehicle?.type, selectedVehicle?.fuelType);
 
   async function load() {
     const [list, tpl, veh, drv] = await Promise.all([
@@ -93,7 +100,20 @@ export default function ChecklistsPage() {
               </select>
             </Field>
             <Field label="Veículo">
-              <select className="select" required value={form.vehicleId} onChange={(e) => setForm({ ...form, vehicleId: e.target.value })}>
+              <select
+                className="select"
+                required
+                value={form.vehicleId}
+                onChange={(e) => {
+                  const vehicleId = e.target.value;
+                  const v = vehicles.find((x) => x.id === vehicleId);
+                  setForm({
+                    ...form,
+                    vehicleId,
+                    odometerKm: v?.odometerKm != null ? String(v.odometerKm) : form.odometerKm,
+                  });
+                }}
+              >
                 <option value="">Selecione</option>
                 {vehicles.map((v) => <option key={v.id} value={v.id}>{v.plate}</option>)}
               </select>
@@ -103,6 +123,17 @@ export default function ChecklistsPage() {
                 <option value="">Opcional</option>
                 {drivers.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
+            </Field>
+            <Field label={usageLabel(metric)}>
+              <input
+                className="input"
+                type="number"
+                step={metric === 'HOURS' ? '0.1' : '1'}
+                min="0"
+                value={form.odometerKm}
+                onChange={(e) => setForm({ ...form, odometerKm: e.target.value })}
+                placeholder={metric === 'HOURS' ? 'Horas do horímetro' : 'Km do odômetro'}
+              />
             </Field>
           </div>
           <div className="grid sm:grid-cols-2 gap-2">

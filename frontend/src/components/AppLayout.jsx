@@ -18,7 +18,7 @@ const links = [
   { to: '/checklists', label: 'Checklists', icon: ClipboardCheck },
   { to: '/abastecimentos', label: 'Abastecimento', icon: Fuel },
   { to: '/manutencoes', label: 'Manutenções', icon: Wrench },
-  { to: '/pneus', label: 'Pneus', icon: Droplets },
+  { to: '/pneus', label: 'Pneus e baterias', icon: Droplets },
   { to: '/avarias', label: 'Avarias', icon: AlertTriangle },
   { to: '/mapa', label: 'Mapa', icon: Map, roles: ['ADMIN', 'SUPERVISOR'] },
   { to: '/turnos', label: 'Turnos', icon: CalendarClock, roles: ['ADMIN', 'SUPERVISOR'] },

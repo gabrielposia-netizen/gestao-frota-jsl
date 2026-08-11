@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 import { authRequired } from '../middleware/auth.js';
 import {
-  isCargoAllowedForRegister,
+  canRegisterEmployee,
   isEmployeeActive,
   normalizeMatricula,
   roleFromCargo,
@@ -68,7 +68,7 @@ router.get('/qlp/:matricula', async (req, res) => {
     if (!isEmployeeActive(employee.status)) {
       return res.status(400).json({ error: 'Colaborador não está ativo no QLP' });
     }
-    if (!isCargoAllowedForRegister(employee.cargo)) {
+    if (!canRegisterEmployee(employee)) {
       return res.status(403).json({
         error: 'Matrícula sem permissão de cadastro neste sistema (cargo não autorizado)',
         cargo: employee.cargo,
@@ -107,7 +107,7 @@ router.post('/register', async (req, res) => {
     if (!isEmployeeActive(employee.status)) {
       return res.status(400).json({ error: 'Colaborador não está ativo no QLP' });
     }
-    if (!isCargoAllowedForRegister(employee.cargo)) {
+    if (!canRegisterEmployee(employee)) {
       return res.status(403).json({ error: 'Cargo não autorizado para cadastro neste sistema' });
     }
 
@@ -123,7 +123,7 @@ router.post('/register', async (req, res) => {
         email,
         matricula,
         passwordHash,
-        role: roleFromCargo(employee.cargo),
+        role: roleFromCargo(employee.cargo, employee.nome),
       },
     });
 

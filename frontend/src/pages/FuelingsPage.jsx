@@ -3,6 +3,7 @@ import { FileText, Plus } from 'lucide-react';
 import { api } from '../lib/api';
 import { fmtDateTime, money } from '../lib/labels';
 import { Field, Modal, PageHeader } from '../components/ui';
+import { suggestUsageMetric, usageLabel } from '../lib/usage';
 
 const CARDS = [
   'Visa Corporativo **** 4412',
@@ -21,6 +22,9 @@ export default function FuelingsPage() {
   const [form, setForm] = useState({
     vehicleId: '', driverId: '', liters: '', unitPrice: '', odometerKm: '', station: '', creditCard: '',
   });
+
+  const selectedVehicle = vehicles.find((v) => v.id === form.vehicleId);
+  const metric = selectedVehicle?.usageMetric || suggestUsageMetric(selectedVehicle?.type, selectedVehicle?.fuelType);
 
   async function load() {
     const [list, veh, drv] = await Promise.all([
@@ -88,7 +92,16 @@ export default function FuelingsPage() {
       <Modal open={open} onClose={() => setOpen(false)} title="Registrar abastecimento">
         <form className="space-y-3" onSubmit={save}>
           <Field label="Veículo">
-            <select className="select" required value={form.vehicleId} onChange={(e) => setForm({ ...form, vehicleId: e.target.value })}>
+            <select
+              className="select"
+              required
+              value={form.vehicleId}
+              onChange={(e) => {
+                const vehicleId = e.target.value;
+                const v = vehicles.find((x) => x.id === vehicleId);
+                setForm({ ...form, vehicleId, odometerKm: v?.odometerKm != null ? String(v.odometerKm) : '' });
+              }}
+            >
               <option value="">Selecione</option>
               {vehicles.map((v) => <option key={v.id} value={v.id}>{v.plate}</option>)}
             </select>
@@ -103,7 +116,9 @@ export default function FuelingsPage() {
             <Field label="Litros"><input className="input" type="number" step="0.01" required value={form.liters} onChange={(e) => setForm({ ...form, liters: e.target.value })} /></Field>
             <Field label="Preço/L"><input className="input" type="number" step="0.01" required value={form.unitPrice} onChange={(e) => setForm({ ...form, unitPrice: e.target.value })} /></Field>
           </div>
-          <Field label="Odômetro"><input className="input" type="number" value={form.odometerKm} onChange={(e) => setForm({ ...form, odometerKm: e.target.value })} /></Field>
+          <Field label={usageLabel(metric)}>
+            <input className="input" type="number" step="0.1" value={form.odometerKm} onChange={(e) => setForm({ ...form, odometerKm: e.target.value })} />
+          </Field>
           <Field label="Posto"><input className="input" value={form.station} onChange={(e) => setForm({ ...form, station: e.target.value })} /></Field>
           <Field label="Cartão de crédito utilizado">
             <select className="select" required value={form.creditCard} onChange={(e) => setForm({ ...form, creditCard: e.target.value })}>

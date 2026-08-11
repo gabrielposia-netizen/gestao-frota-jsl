@@ -5,11 +5,12 @@ import { api } from '../lib/api';
 import { TYPE_LABEL } from '../lib/labels';
 import { Field, Modal, PageHeader, StatusBadge } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
+import { formatUsage, suggestUsageMetric, usageLabel } from '../lib/usage';
 
 const empty = {
   plate: '', model: '', manufacturer: '', year: new Date().getFullYear(),
   renavam: '', chassis: '', sector: '', type: 'CAMINHAO', status: 'DISPONIVEL',
-  odometerKm: 0, fuelType: 'Diesel', locationLabel: '', currentLat: '', currentLng: '',
+  usageMetric: 'KM', odometerKm: 0, fuelType: 'Diesel', locationLabel: '', currentLat: '', currentLng: '',
 };
 
 export default function VehiclesPage() {
@@ -97,7 +98,7 @@ export default function VehiclesPage() {
               <th>Setor</th>
               <th>Status</th>
               <th>Local</th>
-              <th>Km</th>
+              <th>Uso</th>
               <th></th>
             </tr>
           </thead>
@@ -110,7 +111,7 @@ export default function VehiclesPage() {
                 <td>{v.sector || '—'}</td>
                 <td><StatusBadge status={v.status} /></td>
                 <td>{v.locationLabel || '—'}</td>
-                <td>{Number(v.odometerKm).toLocaleString('pt-BR')}</td>
+                <td>{formatUsage(v.odometerKm, v.usageMetric || suggestUsageMetric(v.type, v.fuelType))}</td>
                 <td>
                   <Link className="btn btn-secondary px-2 py-1" to={`/veiculos/${v.id}`}>
                     <QrCode size={14} /> Detalhes
@@ -127,16 +128,41 @@ export default function VehiclesPage() {
           {[
             ['plate', 'Placa'], ['model', 'Modelo'], ['manufacturer', 'Fabricante'], ['year', 'Ano'],
             ['renavam', 'RENAVAM'], ['chassis', 'Chassi'], ['sector', 'Setor'], ['fuelType', 'Combustível'],
-            ['odometerKm', 'Odômetro (km)'], ['locationLabel', 'Localização'], ['currentLat', 'Latitude'], ['currentLng', 'Longitude'],
+            ['locationLabel', 'Localização'], ['currentLat', 'Latitude'], ['currentLng', 'Longitude'],
           ].map(([key, label]) => (
             <Field key={key} label={label}>
-              <input className="input" value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} required={['plate', 'model', 'manufacturer', 'year'].includes(key)} />
+              <input
+                className="input"
+                value={form[key]}
+                onChange={(e) => {
+                  const next = { ...form, [key]: e.target.value };
+                  if (key === 'fuelType') next.usageMetric = suggestUsageMetric(next.type, next.fuelType);
+                  setForm(next);
+                }}
+                required={['plate', 'model', 'manufacturer', 'year'].includes(key)}
+              />
             </Field>
           ))}
           <Field label="Tipo">
-            <select className="select" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+            <select
+              className="select"
+              value={form.type}
+              onChange={(e) => {
+                const type = e.target.value;
+                setForm({ ...form, type, usageMetric: suggestUsageMetric(type, form.fuelType) });
+              }}
+            >
               {Object.entries(TYPE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
+          </Field>
+          <Field label="Métrica de uso">
+            <select className="select" value={form.usageMetric} onChange={(e) => setForm({ ...form, usageMetric: e.target.value })}>
+              <option value="KM">Odômetro (km) — caminhão/utilitário</option>
+              <option value="HOURS">Horas rodadas — empilhadeira/elétrico/rebocador</option>
+            </select>
+          </Field>
+          <Field label={usageLabel(form.usageMetric)}>
+            <input className="input" type="number" step="0.1" value={form.odometerKm} onChange={(e) => setForm({ ...form, odometerKm: e.target.value })} />
           </Field>
           <Field label="Status">
             <select className="select" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
@@ -147,6 +173,9 @@ export default function VehiclesPage() {
               <option value="INATIVO">Inativo</option>
             </select>
           </Field>
+          <div className="sm:col-span-2 text-xs text-[var(--muted)]">
+            Sugestão automática: empilhadeira, rebocador e elétrico usam <strong>horas</strong>; caminhão e utilitário usam <strong>km</strong>. Você pode trocar manualmente.
+          </div>
           <div className="sm:col-span-2 flex justify-end gap-2 mt-2">
             <button type="button" className="btn btn-secondary" onClick={() => setOpen(false)}>Cancelar</button>
             <button className="btn btn-primary">Salvar</button>
